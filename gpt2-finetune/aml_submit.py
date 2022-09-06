@@ -67,13 +67,18 @@ def main(raw_args=None):
     environment_dir = root_dir / "environment"
 
     # tags
-    tags = {"__nnode": args.nnode, "__nproc_per_node": args.nproc_per_node, "__run_config": args.run_config}
+    tags = {
+        "__nnode": args.nnode,
+        "__nproc_per_node": args.nproc_per_node,
+        "__run_config": args.run_config,
+        "__batch_size": args.batch_size,
+    }
 
     # define the command
     command_job = command(
-        description="ACPT GPT2 Finetune",
-        display_name=f"gpt-finetune-{args.nnode}-{args.nproc_per_node}-{args.run_config}",
-        experiment_name="acpt-gpt2-finetune",
+        description="ACPT GPT2 Finetune Demo",
+        display_name=f"gpt-finetune-{args.nnode}-{args.nproc_per_node}-{args.run_config}-{args.batch_size}",
+        experiment_name="acpt-gpt2-finetune-demo",
         code=code_dir,
         command=(
             "python finetune.py"
