@@ -43,7 +43,9 @@ def get_args(raw_args=None):
     parser.add_argument("--max_steps", type=int, default=2000, help="Max step that a model will run")
 
     # accelerator hyperparameters
-    parser.add_argument("--run_config", type=run_config_to_args, default="no_acc", help="Configs to run for model")
+    parser.add_argument(
+        "--run_config", choices=["no_acc", "ort", "ds", "ds_ort"], default="no_acc", help="Configs to run for model"
+    )
 
     # parse args, extra_args used for job configuration
     args = parser.parse_args(raw_args)
@@ -52,6 +54,7 @@ def get_args(raw_args=None):
 
 def main(raw_args=None):
     args = get_args(raw_args)
+    run_config_args = run_config_to_args(args.run_config)
 
     root_dir = Path(__file__).resolve().parent
 
@@ -64,12 +67,12 @@ def main(raw_args=None):
     environment_dir = root_dir / "environment"
 
     # tags
-    tags = {"__nnode": args.nnode, "__nproc_per_node": args.nproc_per_node}
+    tags = {"__nnode": args.nnode, "__nproc_per_node": args.nproc_per_node, "__run_config": args.run_config}
 
     # define the command
     command_job = command(
         description="ACPT GPT2 Finetune",
-        display_name=f"gpt-finetune-{args.nnode}-{args.nproc_per_node}",
+        display_name=f"gpt-finetune-{args.nnode}-{args.nproc_per_node}-{args.run_config}",
         experiment_name="acpt-gpt2-finetune",
         code=code_dir,
         command=(
@@ -77,7 +80,7 @@ def main(raw_args=None):
             f" --block_size {args.block_size}"
             f" --batch_size {args.batch_size}"
             f" --max_steps {args.max_steps}"
-            f" {' '.join(args.run_config)}"
+            f" {' '.join(run_config_args)}"
         ),
         environment=Environment(
             description="ACPT GPT2 fine-tune environment", build=BuildContext(path=environment_dir)

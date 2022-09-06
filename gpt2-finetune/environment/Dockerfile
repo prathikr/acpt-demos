@@ -1,4 +1,6 @@
-FROM mcr.microsoft.com/azureml/aifx/stable-ubuntu2004-cu115-py38-torch1110:daily.20220829
+FROM mcr.microsoft.com/azureml/curated/pta-pytorch-1.11-py38-cuda11.5-gpu:6
 
-COPY requirements.txt .
-RUN python -m pip install -r requirements.txt
+RUN python -m pip install accelerate \
+                          datasets \
+                          optimum \
+                          transformers

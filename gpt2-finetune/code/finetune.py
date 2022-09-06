@@ -121,7 +121,7 @@ def main(
         "eval_accumulation_steps": 1,
         "max_steps": max_steps,
         "save_strategy": "no",
-        "report_to" : "azure_ml",
+        "report_to": "azure_ml",
         "fp16": fp16,
         "deepspeed": "ds_config_zero_1.json" if deepspeed else None,
         "learning_rate": 5e-6,

@@ -1,8 +1,0 @@
-# finetune requirements
-accelerate
-datasets
-optimum
-transformers
-# aml requirements
-azureml-core
-azureml-mlflow
