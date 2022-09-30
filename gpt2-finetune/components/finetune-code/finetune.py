@@ -1,7 +1,9 @@
 import argparse
 import math
 from itertools import chain
+from pathlib import Path
 
+from azureml.core.run import Run
 from datasets import load_dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, default_data_collator
 
@@ -124,7 +126,7 @@ def main(
         "report_to": "azure_ml",
         "fp16": fp16,
         "deepspeed": "ds_config_zero_1.json" if deepspeed else None,
-        "learning_rate": 5e-6,
+        "learning_rate": 5e-5,
     }
 
     # initialize training arguments
@@ -177,6 +179,20 @@ def main(
     print(text_generator("The war in")[0]["generated_text"])
     print(text_generator("The market in America")[0]["generated_text"])
 
+    if int(rank) == 0:
+        # save trained config, tokenizer and model
+        trained_model_folder = "model"
+        trained_model_path = Path(trained_model_folder)
+        trained_model_path.mkdir(parents=True, exist_ok=True)
+        model.config.save_pretrained(trained_model_path / "config")
+        tokenizer.save_pretrained(trained_model_path / "tokenizer")
+        model.save_pretrained(trained_model_path / "weights")
+
+        # register model
+        run = Run.get_context()
+        run.upload_folder(name="model", path=trained_model_folder)
+        run.register_model(model_name="acpt-gpt2", model_path=trained_model_folder)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="GPT2 Fine-Tuning")
@@ -194,7 +210,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--block_size", type=int, default=1024, help="Block size for text in each training example")
     parser.add_argument("--batch_size", type=int, default=8, help="Batch size per step on each device")
-    parser.add_argument("--max_steps", type=int, default=2000, help="Max step that a model will run")
+    parser.add_argument("--max_steps", type=int, default=200, help="Max step that a model will run")
 
     parser.add_argument("--ort", type=str2bool, default=False, help="Use ORTModule")
     parser.add_argument("--fp16", type=str2bool, default=False, help="Use mixed precision")
