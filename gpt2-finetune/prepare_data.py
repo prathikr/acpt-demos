@@ -89,7 +89,7 @@ def main(raw_args=None):
     root_dir = Path(__file__).resolve().parent
     data_source = root_dir / args.source
 
-    data_dir = root_dir / "code" / "data"
+    data_dir = root_dir / "components" / "finetune-code" / "data"
     data_dir.mkdir(parents=True, exist_ok=True)
 
     # clean data and create data files

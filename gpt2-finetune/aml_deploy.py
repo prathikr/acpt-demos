@@ -86,6 +86,9 @@ def main(raw_args=None):
     print(f"Prompt: {sample_prompt}")
     print(f"Model Output: {model_output}")
 
+    # Delete endpoint
+    # ml_client.online_endpoints.begin_delete(name=online_endpoint_name)
+
 
 if __name__ == "__main__":
     main()
