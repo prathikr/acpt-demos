@@ -45,8 +45,7 @@ def main(raw_args=None):
     environment_dir = component_dir / "environment"
 
     # Creating a unique endpoint name with current datetime to avoid conflicts
-    # online_endpoint_name = "acpt-demo-endpoint-" + datetime.datetime.now().strftime("%m%d%H%M%f")
-    online_endpoint_name = "acpt-demo-endpoint-jk"
+    online_endpoint_name = "acpt-demo-" + datetime.datetime.now().strftime("%m%d%H%M%f")
 
     # create an online endpoint
     print("Creating online endpoint...")
