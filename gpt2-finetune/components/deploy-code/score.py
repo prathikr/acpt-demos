@@ -81,7 +81,7 @@ def run(generate):
     logger.info(f"payload: {payload}")
     logger.info("generation complete")
 
-    return payload["generated"]
+    return payload
 
 
 if __name__ == "__main__":
