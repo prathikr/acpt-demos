@@ -52,4 +52,4 @@ python aml_finetune.py --ws_config ws_config.json --compute v100-32gb-eus \
 ## FAQ
 ### Problem with Azure Authentication
 If there's an Azure authentication issue, install Azure CLI [here](https://docs.microsoft.com/en-us/cli/azure/) and run `az login --use-device-code`
-Additionally, you can try replacing DefaultAzureCredential() in aml_finetune.py with AzureCliCredential
+Additionally, you can try replacing DefaultAzureCredential() in aml_finetune.py with AzureCliCredential()
