@@ -81,12 +81,15 @@ def main(raw_args=None):
         display_name=f"gpt-finetune-{args.nnode}-{args.nproc_per_node}-{args.run_config}-{args.batch_size}",
         experiment_name="acpt-gpt2-finetune-demo",
         code=code_dir,
+        # command=(
+        #     "python finetune.py"
+        #     f" --block_size {args.block_size}"
+        #     f" --batch_size {args.batch_size}"
+        #     f" --max_steps {args.max_steps}"
+        #     f" {' '.join(run_config_args)}"
+        # ),
         command=(
-            "python finetune.py"
-            f" --block_size {args.block_size}"
-            f" --batch_size {args.batch_size}"
-            f" --max_steps {args.max_steps}"
-            f" {' '.join(run_config_args)}"
+            "python finetune_QA.py"
         ),
         environment=Environment(
             description="ACPT GPT2 fine-tune environment", build=BuildContext(path=environment_dir)
