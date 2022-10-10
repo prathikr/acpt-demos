@@ -70,7 +70,7 @@ def main(raw_args=None):
     # define the command
     command_job = command(
         description="ACPT DistilBERT Finetune Demo",
-        display_name=f"gpt-finetune-{args.run_config}",
+        display_name=f"distilbert-finetune-{args.run_config}",
         experiment_name="acpt-distilbert-finetune-demo",
         code=code_dir,
         command=(
