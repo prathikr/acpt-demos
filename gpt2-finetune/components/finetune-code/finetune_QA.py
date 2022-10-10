@@ -1,9 +1,6 @@
 import argparse
-import math
-from itertools import chain
 from pathlib import Path
 
-from azureml.core.run import Run
 from datasets import load_dataset
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer, TrainingArguments, DefaultDataCollator
 
@@ -17,9 +14,8 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError("Boolean value expected.")
 
-def preprocess_function(examples):
+def preprocess_function(examples, tokenizer):
     questions = [q.strip() for q in examples["question"]]
-    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
     inputs = tokenizer(
         questions,
         examples["context"],
@@ -70,14 +66,6 @@ def preprocess_function(examples):
     return inputs
 
 def main(
-    model_path: str,
-    tokenizer_path: str,
-    config_path: str,
-    train_path: str,
-    validation_path: str,
-    block_size: int,
-    batch_size: int,
-    max_steps: int,
     ort: bool,
     fp16: bool,
     deepspeed: bool,
@@ -94,7 +82,7 @@ def main(
 
     # Load pretrained model and tokenizer
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-    tokenized_squad = squad.map(preprocess_function, batched=True, remove_columns=squad["train"].column_names)
+    tokenized_squad = squad.map(preprocess_function, input_columns=[tokenizer], batched=True, remove_columns=squad["train"].column_names)
     data_collator = DefaultDataCollator()
     model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
 
@@ -104,13 +92,11 @@ def main(
         "do_eval": True,
         "per_device_train_batch_size": 16,
         "per_device_eval_batch_size": 16,
-        "eval_accumulation_steps": 1,
-        "max_steps": max_steps,
-        "save_strategy": "no",
-        "report_to": "azure_ml",
+        "learning_rate": 2e-5,
+        "num_train_epochs": 3,
+        "weight_decay": 0.01,
         "fp16": fp16,
         "deepspeed": "ds_config_zero_1.json" if deepspeed else None,
-        "learning_rate": 2e-5,
     }
 
     # initialize training arguments
@@ -156,29 +142,9 @@ def main(
         tokenizer.save_pretrained(trained_model_path / "tokenizer")
         model.save_pretrained(trained_model_path / "weights")
 
-        # register model
-        run = Run.get_context()
-        run.upload_folder(name="model", path=trained_model_folder)
-        run.register_model(model_name="acpt-gpt2", model_path=trained_model_folder)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="GPT2 Fine-Tuning")
-
-    parser.add_argument(
-        "--model_path", type=str, default="gpt2", help="The model checkpoint for weights initialization"
-    )
-    parser.add_argument("--tokenizer_path", type=str, default="gpt2", help="Pretrained tokenizer path")
-    parser.add_argument("--config_path", type=str, default="gpt2", help="Pretrained model configuration")
-
-    parser.add_argument("--train_path", type=str, default="data/training_raw.txt", help="Pre-processed training data")
-    parser.add_argument(
-        "--validation_path", type=str, default="data/validation_raw.txt", help="Pre-processed validation data"
-    )
-
-    parser.add_argument("--block_size", type=int, default=1024, help="Block size for text in each training example")
-    parser.add_argument("--batch_size", type=int, default=8, help="Batch size per step on each device")
-    parser.add_argument("--max_steps", type=int, default=200, help="Max step that a model will run")
 
     parser.add_argument("--ort", type=str2bool, default=False, help="Use ORTModule")
     parser.add_argument("--fp16", type=str2bool, default=False, help="Use mixed precision")

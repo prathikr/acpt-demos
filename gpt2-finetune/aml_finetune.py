@@ -37,11 +37,6 @@ def get_args(raw_args=None):
         help="No of GPUs per node. Default is 8",
     )
 
-    # fine-tune hyperparameters
-    parser.add_argument("--block_size", type=int, default=1024, help="Block size for text in each training example")
-    parser.add_argument("--batch_size", type=int, default=8, help="Batch size per step on each device")
-    parser.add_argument("--max_steps", type=int, default=200, help="Max step that a model will run")
-
     # accelerator hyperparameters
     parser.add_argument(
         "--run_config", choices=["no_acc", "ort", "ds", "ds_ort"], default="no_acc", help="Configs to run for model"
@@ -81,15 +76,9 @@ def main(raw_args=None):
         display_name=f"gpt-finetune-{args.nnode}-{args.nproc_per_node}-{args.run_config}-{args.batch_size}",
         experiment_name="acpt-gpt2-finetune-demo",
         code=code_dir,
-        # command=(
-        #     "python finetune.py"
-        #     f" --block_size {args.block_size}"
-        #     f" --batch_size {args.batch_size}"
-        #     f" --max_steps {args.max_steps}"
-        #     f" {' '.join(run_config_args)}"
-        # ),
         command=(
             "python finetune_QA.py"
+            f" {' '.join(run_config_args)}"
         ),
         environment=Environment(
             description="ACPT GPT2 fine-tune environment", build=BuildContext(path=environment_dir)
