@@ -144,7 +144,7 @@ def main(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="GPT2 Fine-Tuning")
+    parser = argparse.ArgumentParser(description="DistilBERT Fine-Tuning")
 
     parser.add_argument("--ort", type=str2bool, default=False, help="Use ORTModule")
     parser.add_argument("--fp16", type=str2bool, default=False, help="Use mixed precision")

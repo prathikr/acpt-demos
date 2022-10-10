@@ -17,7 +17,7 @@ def run_config_to_args(run_config):
 
 
 def get_args(raw_args=None):
-    parser = argparse.ArgumentParser(description="GPT2 Finetune AML job submission")
+    parser = argparse.ArgumentParser(description="DistilBERT Finetune AML job submission")
 
     # workspace
     parser.add_argument(
@@ -69,16 +69,16 @@ def main(raw_args=None):
 
     # define the command
     command_job = command(
-        description="ACPT GPT2 Finetune Demo",
+        description="ACPT DistilBERT Finetune Demo",
         display_name=f"gpt-finetune-{args.run_config}",
-        experiment_name="acpt-gpt2-finetune-demo",
+        experiment_name="acpt-distilbert-finetune-demo",
         code=code_dir,
         command=(
-            "python finetune_QA.py"
+            "python finetune.py"
             f" {' '.join(run_config_args)}"
         ),
         environment=Environment(
-            description="ACPT GPT2 fine-tune environment", build=BuildContext(path=environment_dir)
+            description="ACPT DistilBERT fine-tune environment", build=BuildContext(path=environment_dir)
         ),
         distribution={
             "type": "pytorch",
