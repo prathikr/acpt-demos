@@ -19,6 +19,7 @@ def str2bool(v):
 
 def preprocess_function(examples):
     questions = [q.strip() for q in examples["question"]]
+    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
     inputs = tokenizer(
         questions,
         examples["context"],
