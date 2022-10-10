@@ -64,10 +64,7 @@ def main(raw_args=None):
 
     # tags
     tags = {
-        "__nnode": args.nnode,
-        "__nproc_per_node": args.nproc_per_node,
         "__run_config": args.run_config,
-        "__batch_size": args.batch_size,
     }
 
     # define the command
