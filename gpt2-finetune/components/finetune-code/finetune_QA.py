@@ -85,9 +85,9 @@ def main(
 
     import os
 
-    rank = os.environ.get("RANK", -1)
-    assert rank != -1
-    cache_dir = f".cache_{rank}"
+    # rank = os.environ.get("RANK", -1)
+    # assert rank != -1
+    # cache_dir = f".cache_{rank}"
 
     # Load the SQuAD dataset from the Huggingface Datasets library
     squad = load_dataset("squad")
