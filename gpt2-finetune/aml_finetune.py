@@ -3,7 +3,7 @@ from pathlib import Path
 
 from azure.ai.ml import MLClient, command
 from azure.ai.ml.entities import BuildContext, Environment
-from azure.identity import DefaultAzureCredential
+from azure.identity import AzureCliCredential
 
 
 def run_config_to_args(run_config):
@@ -61,7 +61,7 @@ def main(raw_args=None):
 
     # connect to the workspace
     ws_config_path = root_dir / args.ws_config
-    ml_client = MLClient.from_config(credential=DefaultAzureCredential(), path=ws_config_path)
+    ml_client = MLClient.from_config(credential=AzureCliCredential(), path=ws_config_path)
 
     # code directory
     code_dir = component_dir / "finetune-code"
