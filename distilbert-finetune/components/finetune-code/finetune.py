@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 
+from azureml.core.run import Run
 from datasets import load_dataset
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer, TrainingArguments, DefaultDataCollator
 
@@ -141,6 +142,11 @@ def main(
         model.config.save_pretrained(trained_model_path / "config")
         tokenizer.save_pretrained(trained_model_path / "tokenizer")
         model.save_pretrained(trained_model_path / "weights")
+
+        # register model
+        run = Run.get_context()
+        run.upload_folder(name="model", path=trained_model_folder)
+        run.register_model(model_name="acpt-gpt2", model_path=trained_model_folder)
 
 
 if __name__ == "__main__":
