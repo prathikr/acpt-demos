@@ -1,12 +1,12 @@
-# GPT2 Fine-tuning Demo
+# DistilBERT Fine-tuning Demo
 
-This demo will show how to use ACPT along with accelerators such as onnxruntime training (through ORTModule) and DeepSpeed to fine-tune a GPT-2 model on Homer texts.
+This demo will show how to use ACPT along with accelerators such as onnxruntime training (through ORTModule) and DeepSpeed to fine-tune a DistilBERT model on the SQuAD dataset from the Huggingface Datasets library.
 
 ## Background
 
-GPT-2 is a transformers based language model that has been pre-trained on a large corpus of text data. It can be fine-tuned for task such as causal language modeling where it generates additional text based on prefix text by training it on additional data.
+DistilBERT is a transformers based language model that has been pre-trained on a large corpus of text data. It can be fine-tuned for task such as question-answer where it reads a context paragraph and given a question it will answer based on the context.
 
-In this demo, we will fine-tune it using Homer's The Illiad and The Odyssey so that it generates text that sound like Homer. We will use ACPT to create our training environment and leverage some of the training acceleration technologies it offers.
+In this demo, we will fine-tune DistilBERT using the SQuAD dataset from the Huggingface Datasets library. We will use ACPT to create our training environment and leverage some of the training acceleration technologies it offers.
 
 ## Set up
 
@@ -23,12 +23,6 @@ pip install azure-ai-ml
 #### AzureML Workspace
 - An AzureML workspace is required to run this demo. Download the config.json file ([How to get config.json file from Azure Portal](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-configure-environment#workspace)) for your workspace.
 - The workspace should have a gpu cluster. This demo was tested with GPU cluster of SKU [Standard_ND40rs_v2](https://docs.microsoft.com/en-us/azure/virtual-machines/ndv2-series). See this document for [creating gpu cluster](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-create-attach-compute-cluster?tabs=python). We do not recommend running this demo on `NC` series VMs which uses old architecture (K80).
-
-### Prepare Data
-Prepare the data by running the following script which downloads the Homer texts and processes them into data files ready for training.
-```
-python prepare_data.py
-```
 
 ## Run Experiments
 The demo is ready to be run.
@@ -55,32 +49,7 @@ python aml_finetune.py --ws_config ws_config.json --compute v100-32gb-eus \
     --run_config ds_ort
 ```
 
-Other parameters.
-
-| Name                | Description |
-|---------------------|-------------|
-| --nnode             | Number of nodes. Defaults to 1. |
-| --nproc_per_node    | Number of processes per node. Defaults to 8. Set this value to the number of GPUs on each node. |
-| --block_size        | Size of text blocks for each example. Defaults to 1024. |
-| --batch_size        | Model batchsize per GPU. Defaults to 8. |
-| --max_steps         | Max step that a model will run. Defaults to 2000. |
-
-## Deploy model to Endpoint
-`aml_finetune.py` trains the model and registers it in your workspace as a Model named `acpt-gpt2`.
-
-`aml_deploy.py` deploys the model registered as an endpoint and tests a sample prompt once deployment has succeeded. You can use the python sdk to test further prompt or use the Studio UI (under `Workspace -> Endpoints -> Real-time endpoints -> [Endpoint Name] -> test).
-
-```bash
-aml_deploy.py --ws_config [Path to workspace config json]
-```
-
-Note: Deployment may take some time to complete. Delete the deployment after use.
-
 ## FAQ
 ### Problem with Azure Authentication
 If there's an Azure authentication issue, install Azure CLI [here](https://docs.microsoft.com/en-us/cli/azure/) and run `az login --use-device-code`
-
-### In case of `RuntimeError: CUDA out of memory` error
-The issue is most likely caused by hitting a HW limitation on the target, this can be mitigated by using the following switches
-
-`--batch_size` - Change to smaller batch size. Default is 8.
+Additionally, you can try replacing DefaultAzureCredential() in aml_finetune.py with AzureCliCredential
