@@ -70,7 +70,7 @@ def main(raw_args=None):
     # define the command
     command_job = command(
         description="ACPT GPT2 Finetune Demo",
-        display_name=f"gpt-finetune-{args.nnode}-{args.nproc_per_node}-{args.run_config}-{args.batch_size}",
+        display_name=f"gpt-finetune-{args.run_config}",
         experiment_name="acpt-gpt2-finetune-demo",
         code=code_dir,
         command=(
