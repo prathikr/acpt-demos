@@ -4,6 +4,8 @@ from pathlib import Path
 from datasets import load_dataset
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer, TrainingArguments, DefaultDataCollator
 
+global tokenizer
+
 def str2bool(v):
     if isinstance(v, bool):
         return v
