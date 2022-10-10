@@ -85,9 +85,9 @@ def main(
 
     import os
 
-    # rank = os.environ.get("RANK", -1)
-    # assert rank != -1
-    # cache_dir = f".cache_{rank}"
+    rank = os.environ.get("RANK", -1)
+    assert rank != -1
+    cache_dir = f".cache_{rank}"
 
     # Load the SQuAD dataset from the Huggingface Datasets library
     squad = load_dataset("squad")
@@ -136,8 +136,6 @@ def main(
         data_collator=data_collator,
     )
 
-    last_checkpoint = None
-
     # train
     train_result = trainer.train()
 
@@ -147,8 +145,6 @@ def main(
 
     eval_metrics = trainer.evaluate()
     eval_metrics["eval_samples"] = len(tokenized_squad["validation"])
-    perplexity = math.exp(eval_metrics["eval_loss"])
-    eval_metrics["perplexity"] = perplexity
     trainer.log_metrics("eval", eval_metrics)
 
     if int(rank) == 0:
