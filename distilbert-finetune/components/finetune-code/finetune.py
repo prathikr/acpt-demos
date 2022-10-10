@@ -4,8 +4,6 @@ from pathlib import Path
 from datasets import load_dataset
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer, TrainingArguments, DefaultDataCollator
 
-global tokenizer
-
 def str2bool(v):
     if isinstance(v, bool):
         return v
@@ -16,7 +14,7 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError("Boolean value expected.")
 
-def preprocess_function(examples):
+def preprocess_function(examples, tokenizer):
     questions = [q.strip() for q in examples["question"]]
     inputs = tokenizer(
         questions,
@@ -84,7 +82,7 @@ def main(
 
     # Load pretrained model and tokenizer
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-    tokenized_squad = squad.map(preprocess_function, batched=True, remove_columns=squad["train"].column_names)
+    tokenized_squad = squad.map(preprocess_function, tokenizer, batched=True, remove_columns=squad["train"].column_names)
     data_collator = DefaultDataCollator()
     model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
 
