@@ -18,7 +18,7 @@ def get_args(raw_args=None):
     return args
 
 def infer(args):
-    model = torch.load("model_weights.bin")
+    model = torch.load("pytorch_model.bin")
     test_input = json.loads("input.json")
 
     if args.run_config == "no_acc":
