@@ -145,7 +145,7 @@ def main(
         # register model
         run = Run.get_context()
         run.upload_folder(name="model", path=trained_model_folder)
-        run.register_model(model_name="acpt-gpt2", model_path=trained_model_folder)
+        run.register_model(model_name="acpt-distilbert", model_path=trained_model_folder)
 
 
 if __name__ == "__main__":
