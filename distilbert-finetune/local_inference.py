@@ -47,7 +47,7 @@ def infer(args):
     df_dataset = Dataset.from_pandas(df)
 
     test_data = {"test": df_dataset}
-    test_df_dataset = DatasetDict(test_data)
+    test_df_dataset = DatasetDict(test_data, num_rows=len(data["id"]))
     print("test_df_datasetdict\n", test_df_dataset)
 
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
