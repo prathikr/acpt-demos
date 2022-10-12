@@ -93,7 +93,7 @@ def main(
         "per_device_train_batch_size": 16,
         "per_device_eval_batch_size": 16,
         "learning_rate": 2e-5,
-        "num_train_epochs": 1,
+        "num_train_epochs": 50,
         "weight_decay": 0.01,
         "fp16": True,
         "deepspeed": "ds_config_zero_1.json" if deepspeed else None,
