@@ -2,7 +2,7 @@ import argparse
 import json
 
 import torch
-from transformers import AutoModelForQuestionAnswering, AutoTokenizer
+from transformers import AutoModelForQuestionAnswering, AutoTokenizer, DefaultDataCollator
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
