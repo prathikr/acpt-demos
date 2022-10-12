@@ -47,11 +47,11 @@ def infer(args):
     df_dataset = Dataset.from_pandas(df)
 
     test_data = {"test": df_dataset}
-    test_df_dataset = DatasetDict(test_data, num_rows=len(data["id"]))
+    test_df_dataset = DatasetDict(test_data)
     print("test_df_datasetdict\n", test_df_dataset)
 
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-    tokenized_inputs = test_df_dataset.map(preprocess_function, fn_kwargs={"tokenizer": tokenizer}, batched=True, remove_columns=test_df_dataset["test"].column_names)
+    tokenized_inputs = test_df_dataset.map(preprocess_function, fn_kwargs={"tokenizer": tokenizer}, batched=False, remove_columns=test_df_dataset["test"].column_names)
 
     if args.run_config == "no_acc":
         predictions = model(tokenized_inputs)
