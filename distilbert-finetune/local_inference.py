@@ -31,7 +31,7 @@ def preprocess_function(examples, tokenizer):
     return inputs
 
 def infer(args):
-    model = AutoModelForQuestionAnswering()
+    model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
     model.load_state_dict(torch.load("pytorch_model.bin"))
 
     # from datasets import Dataset, DatasetDict
