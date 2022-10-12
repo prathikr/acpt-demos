@@ -67,6 +67,7 @@ def infer(args):
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
 
     start_scores, end_scores = model(torch.tensor([input_ids]), attention_mask=torch.tensor([attention_mask]))
+    print(start_scores, end_scores)
 
     ans_tokens = input_ids[torch.argmax(start_scores) : torch.argmax(end_scores)+1]
     answer_tokens = tokenizer.convert_ids_to_tokens(ans_tokens , skip_special_tokens=True)
