@@ -1,7 +1,6 @@
 import argparse
 from pathlib import Path
 
-# from azureml.core.run import Run
 from datasets import load_dataset
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer, TrainingArguments, DefaultDataCollator
 
@@ -68,7 +67,6 @@ def preprocess_function(examples, tokenizer=None):
 
 def main(
     ort: bool,
-    fp16: bool,
     deepspeed: bool,
 ):
 
@@ -96,7 +94,7 @@ def main(
         "learning_rate": 2e-5,
         "num_train_epochs": 3,
         "weight_decay": 0.01,
-        "fp16": fp16,
+        "fp16": True,
         "deepspeed": "ds_config_zero_1.json" if deepspeed else None,
     }
 
@@ -153,7 +151,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="DistilBERT Fine-Tuning")
 
     parser.add_argument("--ort", type=str2bool, default=False, help="Use ORTModule")
-    parser.add_argument("--fp16", type=str2bool, default=False, help="Use mixed precision")
     parser.add_argument("--deepspeed", type=str2bool, default=False, help="Use deepspeed")
 
     args = parser.parse_args()
