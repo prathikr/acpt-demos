@@ -59,9 +59,11 @@ def infer(args):
         return_offsets_mapping=False,
         padding="max_length",
     )
+    data_collator = DefaultDataCollator()
+    batched_inputs = data_collator(inputs)
 
     if args.run_config == "no_acc":
-        predictions = model(**inputs)
+        predictions = model(**batched_inputs)
     elif args.run_config == "ort":
         import onnxruntime
 
