@@ -35,7 +35,7 @@ def infer(args):
     model.load_state_dict(torch.load("pytorch_model.bin"))
     model.eval()
 
-    from datasets import Dataset
+    from datasets import Dataset, DatasetDict
     import pandas as pd
     data = {
         "id": [1, 2],
@@ -47,9 +47,8 @@ def infer(args):
     df_dataset = Dataset.from_pandas(df)
 
     test_data = {"test": df_dataset}
-    test_df = pd.DataFrame(test_data)
-    test_df_dataset = Dataset.from_pandas(test_df)
-    print("test_df_dataset", test_df_dataset)
+    test_df_dataset = DatasetDict(test_data)
+    print("test_df_datasetdict", test_df_dataset)
 
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
     tokenized_inputs = test_df_dataset.map(preprocess_function, fn_kwargs={"tokenizer": tokenizer}, batched=True, remove_columns=test_df_dataset["test"].column_names)
