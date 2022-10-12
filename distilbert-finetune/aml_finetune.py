@@ -8,10 +8,10 @@ from azure.identity import AzureCliCredential
 
 def run_config_to_args(run_config):
     mapping = {
-        "no_acc": ["--fp16", "True"],
-        "ds": ["--fp16", "True", "--deepspeed", "True"],
-        "ort": ["--fp16", "True", "--ort", "True"],
-        "ds_ort": ["--fp16", "True", "--deepspeed", "True", "--ort", "True"],
+        "no_acc": [],
+        "ds": ["--deepspeed", "True"],
+        "ort": ["--ort", "True"],
+        "ds_ort": ["--deepspeed", "True", "--ort", "True"],
     }
     return mapping[run_config]
 
@@ -27,15 +27,6 @@ def get_args(raw_args=None):
         help="Workspace configuration. Path is absolute or relative to where script is called from",
     )
     parser.add_argument("--compute", type=str, required=True, help="Compute target to run job on")
-
-    # distributed training config
-    parser.add_argument("--nnode", type=int, default=1, help="No of nodes. Default is 1")
-    parser.add_argument(
-        "--nproc_per_node",
-        type=int,
-        default=8,
-        help="No of GPUs per node. Default is 8",
-    )
 
     # accelerator hyperparameters
     parser.add_argument(
@@ -82,10 +73,10 @@ def main(raw_args=None):
         ),
         distribution={
             "type": "pytorch",
-            "process_count_per_instance": args.nproc_per_node,
+            "process_count_per_instance": 8,
         },
         compute=args.compute,
-        instance_count=args.nnode,
+        instance_count=1,
         tags=tags,
     )
 
