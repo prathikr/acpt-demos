@@ -141,11 +141,6 @@ def main(
         tokenizer.save_pretrained(trained_model_path / "tokenizer")
         model.save_pretrained(trained_model_path / "weights")
 
-        # register model
-        # run = Run.get_context()
-        # run.upload_folder(name="model", path=trained_model_folder)
-        # run.register_model(model_name="acpt-distilbert", model_path=trained_model_folder)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="DistilBERT Fine-Tuning")
