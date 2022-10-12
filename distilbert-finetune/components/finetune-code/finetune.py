@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 
+from azureml.core.run import Run
 from datasets import load_dataset
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer, TrainingArguments, DefaultDataCollator
 
@@ -92,7 +93,7 @@ def main(
         "per_device_train_batch_size": 16,
         "per_device_eval_batch_size": 16,
         "learning_rate": 2e-5,
-        "num_train_epochs": 50,
+        "num_train_epochs": 1,
         "weight_decay": 0.01,
         "fp16": True,
         "deepspeed": "ds_config_zero_1.json" if deepspeed else None,
@@ -140,6 +141,11 @@ def main(
         model.config.save_pretrained(trained_model_path / "config")
         tokenizer.save_pretrained(trained_model_path / "tokenizer")
         model.save_pretrained(trained_model_path / "weights")
+
+        # register model
+        run = Run.get_context()
+        run.upload_folder(name="model", path=trained_model_folder)
+        run.register_model(model_name="acpt-gpt2", model_path=trained_model_folder)
 
 
 if __name__ == "__main__":
