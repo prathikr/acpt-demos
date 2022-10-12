@@ -42,50 +42,19 @@ def infer(args):
     question2 = "What is the best song ever?"
     context2 = "The best song ever is Candy Paint by Post Malone."
 
-    questions = [question1, question2]
-    contexts = [context1, context2]
+    data = [(question1, context1), (question2, context2)]
 
-    inputs = tokenizer(questions, contexts, return_tensors="pt")
-    with torch.no_grad():
-        outputs = model(**inputs)
+    for question, context in data:
+        inputs = tokenizer(question, context, return_tensors="pt")
+        with torch.no_grad():
+            outputs = model(**inputs)
 
-    answer_start_index = outputs.start_logits.argmax()
-    answer_end_index = outputs.end_logits.argmax()
+        answer_start_index = outputs.start_logits.argmax()
+        answer_end_index = outputs.end_logits.argmax()
 
-    predict_answer_tokens = inputs.input_ids[0, answer_start_index : answer_end_index + 1]
-    prediction = tokenizer.decode(predict_answer_tokens)
-    print(prediction)
-    
-    # encoding = tokenizer.encode_plus(question, context)
-
-    # input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
-
-    # start_scores, end_scores = model(torch.tensor([input_ids]), attention_mask=torch.tensor([attention_mask]))
-    # print(start_scores, end_scores)
-
-    # ans_tokens = input_ids[torch.argmax(start_scores) : torch.argmax(end_scores)+1]
-    # answer_tokens = tokenizer.convert_ids_to_tokens(ans_tokens , skip_special_tokens=True)
-
-    # print ("\nQuestion ",question)
-    # print ("\nAnswer Tokens: ")
-    # print (answer_tokens)
-
-    # answer_tokens_to_string = tokenizer.convert_tokens_to_string(answer_tokens)
-
-    # print ("\nAnswer : ",answer_tokens_to_string)
-
-
-    # if args.run_config == "no_acc":
-    #     predictions = model(**batched_inputs)
-    # elif args.run_config == "ort":
-    #     import onnxruntime
-
-    #     torch.export.onnx(model, "model.onnx")
-    #     ort_session = onnxruntime.InferenceSession('model.onnx')
-    #     predictions = ort_session.run(None, {'input': inputs})        
-
-    # print(f'Input: "{inputs}"')
-    # print(f'Prediction: "{predictions}"')
+        predict_answer_tokens = inputs.input_ids[0, answer_start_index : answer_end_index + 1]
+        prediction = tokenizer.decode(predict_answer_tokens)
+        print(prediction)
 
 def main(raw_args=None):
     args = get_args(raw_args)
