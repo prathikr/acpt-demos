@@ -31,9 +31,8 @@ def preprocess_function(examples, tokenizer):
     return inputs
 
 def infer(args):
-    model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
+    model = AutoModelForQuestionAnswering()
     model.load_state_dict(torch.load("pytorch_model.bin"))
-    model.eval()
 
     # from datasets import Dataset, DatasetDict
     # import pandas as pd
@@ -62,23 +61,35 @@ def infer(args):
 
     question = "To whom did the Virgin Mary allegedly appear in 1858 in Lourdes France?"
     context = "Architecturally, the school has a Catholic character. Atop the Main Building's gold dome is a golden statue of the Virgin Mary. Immediately in front of the Main Building and facing it, is a copper statue of Christ with arms upraised with the legend 'Venite Ad Me Omnes'. Next to the Main Building is the Basilica of the Sacred Heart. Immediately behind the basilica is the Grotto, a Marian place of prayer and reflection. It is a replica of the grotto at Lourdes, France where the Virgin Mary reputedly appeared to Saint Bernadette Soubirous in 1858. At the end of the main drive (and in a direct line that connects through 3 statues and the Gold Dome), is a simple, modern stone statue of Mary."
-    encoding = tokenizer.encode_plus(question, context)
+    
+    inputs = tokenizer(question, context, return_tensors="pt")
+    with torch.no_grad():
+        outputs = model(**inputs)
 
-    input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
+    answer_start_index = outputs.start_logits.argmax()
+    answer_end_index = outputs.end_logits.argmax()
 
-    start_scores, end_scores = model(torch.tensor([input_ids]), attention_mask=torch.tensor([attention_mask]))
-    print(start_scores, end_scores)
+    predict_answer_tokens = inputs.input_ids[0, answer_start_index : answer_end_index + 1]
+    prediction = tokenizer.decode(predict_answer_tokens)
+    print(prediction)
+    
+    # encoding = tokenizer.encode_plus(question, context)
 
-    ans_tokens = input_ids[torch.argmax(start_scores) : torch.argmax(end_scores)+1]
-    answer_tokens = tokenizer.convert_ids_to_tokens(ans_tokens , skip_special_tokens=True)
+    # input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
 
-    print ("\nQuestion ",question)
-    print ("\nAnswer Tokens: ")
-    print (answer_tokens)
+    # start_scores, end_scores = model(torch.tensor([input_ids]), attention_mask=torch.tensor([attention_mask]))
+    # print(start_scores, end_scores)
 
-    answer_tokens_to_string = tokenizer.convert_tokens_to_string(answer_tokens)
+    # ans_tokens = input_ids[torch.argmax(start_scores) : torch.argmax(end_scores)+1]
+    # answer_tokens = tokenizer.convert_ids_to_tokens(ans_tokens , skip_special_tokens=True)
 
-    print ("\nAnswer : ",answer_tokens_to_string)
+    # print ("\nQuestion ",question)
+    # print ("\nAnswer Tokens: ")
+    # print (answer_tokens)
+
+    # answer_tokens_to_string = tokenizer.convert_tokens_to_string(answer_tokens)
+
+    # print ("\nAnswer : ",answer_tokens_to_string)
 
 
     # if args.run_config == "no_acc":
