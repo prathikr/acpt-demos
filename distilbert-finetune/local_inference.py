@@ -48,14 +48,12 @@ def infer(args):
 
     test_data = {"test": df_dataset}
     test_df_dataset = DatasetDict(test_data)
-    print("test_df_datasetdict", test_df_dataset)
+    print("test_df_datasetdict\n", test_df_dataset)
 
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
     tokenized_inputs = test_df_dataset.map(preprocess_function, fn_kwargs={"tokenizer": tokenizer}, batched=True, remove_columns=test_df_dataset["test"].column_names)
 
     if args.run_config == "no_acc":
-        model.to(device)
-        tokenized_inputs = tokenized_inputs.to(device)
         predictions = model(tokenized_inputs)
     elif args.run_config == "ort":
         import onnxruntime
