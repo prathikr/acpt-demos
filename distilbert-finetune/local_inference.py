@@ -38,3 +38,6 @@ def infer(args):
 def main(raw_args=None):
     args = get_args(raw_args)
     infer(args)
+
+if __name__ == "__main__":
+    main()
