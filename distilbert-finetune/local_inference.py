@@ -34,7 +34,13 @@ def infer(args):
 
     encoding = tokenizer.batch_encode_plus(inputs, pad_to_max_length=True, return_tensors="pt")
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
+
+    if args.run_config == "ort":
+        from optimum.onnxruntime import ORTModule
+        model = ORTModule(model)
+
     output = model(input_ids, attention_mask=attention_mask)
+    
     for i in range(len(questions)):
         max_start_logits = output.start_logits[i].argmax()
         max_end_logits = output.end_logits[i].argmax()
