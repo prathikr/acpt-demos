@@ -38,6 +38,9 @@ def infer(args):
     torch.onnx.export(model, (input_ids, attention_mask), "model.onnx")
     sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
 
+    input_name = sess.get_inputs()
+    print(input_name)
+
     start = time.time()
     if args.run_config == "ort":
         output = sess.run([None], {"input": [input_ids, attention_mask]})
