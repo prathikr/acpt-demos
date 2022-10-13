@@ -43,8 +43,6 @@ def infer(args):
     elif args.run_config == "no_acc":
         output = model(input_ids, attention_mask=attention_mask)
     end = time.time()
-
-    print("Inference time: ", end - start)
     
     for i in range(len(questions)):
         max_start_logits = output.start_logits[i].argmax()
@@ -54,6 +52,8 @@ def infer(args):
         answer_tokens_to_string = tokenizer.convert_tokens_to_string(answer_tokens)
         print("Question: ", questions[i])
         print("Answer: ", answer_tokens_to_string)
+
+    print("Inference time: ", end - start, "seconds")
 
 def main(raw_args=None):
     args = get_args(raw_args)
