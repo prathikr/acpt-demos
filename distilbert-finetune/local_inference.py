@@ -33,7 +33,7 @@ def infer(args):
     # if using onnnxruntime, convert to onnx format
     if args.ort:
         torch.onnx.export(model, (input_ids, attention_mask), "model.onnx", input_names=['input_ids', 'attention_mask'], output_names=['start_logits', "end_logits"])                       
-        sess = onnxruntime.InferenceSession('model.onnx')
+        sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider'])
         ort_input = {
             'input_ids': np.ascontiguousarray(input_ids.numpy()),
             'attention_mask' : np.ascontiguousarray(attention_mask.numpy()),
