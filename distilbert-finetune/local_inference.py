@@ -38,6 +38,9 @@ def infer(args):
     outputs = model(**inputs)
     end = time.time()
 
+    tmp = tokenizer.batch_decode(outputs)
+    print(tmp)
+
     for i in range(len(questions)):
         answer_start_index = outputs.start_logits[i].argmax()
         answer_end_index = outputs.end_logits[i].argmax()
