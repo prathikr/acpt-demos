@@ -14,7 +14,6 @@ def infer(args):
     model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
     model.load_state_dict(torch.load("pytorch_model.bin"))
     model.eval()
-    model.to(device)
 
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
 
@@ -30,8 +29,6 @@ def infer(args):
     # tokenize test data
     encoding = tokenizer.batch_encode_plus(inputs, padding=True, return_tensors="pt")
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
-    input_ids = input_ids.to(device)
-    attention_mask = attention_mask.to(device)
 
     # if using onnnxruntime, convert to onnx format
     if args.ort:
@@ -41,6 +38,13 @@ def infer(args):
             'input_ids': np.ascontiguousarray(input_ids.numpy()),
             'attention_mask' : np.ascontiguousarray(attention_mask.numpy()),
         }
+        # send data to GPU
+        ort_input = ort_input.to(device)
+
+    # send data to GPU
+    model.to(device)
+    input_ids = input_ids.to(device)
+    attention_mask = attention_mask.to(device)
 
     # run inference
     start = time.time()
