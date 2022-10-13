@@ -31,7 +31,7 @@ def infer(args):
     
     tokenizer_inputs = []
     for question in questions:
-        tokenizer_inputs.append((question, context))
+        tokenizer_inputs.append([question, context])
 
     inputs = tokenizer(tokenizer_inputs, return_tensors="pt", padding=True)
     start = time.time()
@@ -41,14 +41,14 @@ def infer(args):
     tmp = tokenizer.batch_decode(outputs)
     print(tmp)
 
-    for i in range(len(questions)):
-        answer_start_index = outputs.start_logits[i].argmax()
-        answer_end_index = outputs.end_logits[i].argmax()
+    # for i in range(len(questions)):
+    #     answer_start_index = outputs.start_logits[i].argmax()
+    #     answer_end_index = outputs.end_logits[i].argmax()
 
-        predict_answer_tokens = inputs.input_ids[0, answer_start_index : answer_end_index + 1]
-        prediction = tokenizer.decode(predict_answer_tokens)
-        print("Question: ", question)
-        print("Answer: ", prediction)
+    #     predict_answer_tokens = inputs.input_ids[0, answer_start_index : answer_end_index + 1]
+    #     prediction = tokenizer.decode(predict_answer_tokens)
+    #     print("Question: ", question)
+    #     print("Answer: ", prediction)
 
 
     # print("Context: ", context)
