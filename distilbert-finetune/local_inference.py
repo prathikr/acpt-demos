@@ -21,6 +21,7 @@ def get_args(raw_args=None):
 def infer(args):
     model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
     model.load_state_dict(torch.load("pytorch_model.bin"))
+    model.eval()
 
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
 
@@ -29,8 +30,16 @@ def infer(args):
     print("Context: ", context)
     for question in questions:
         inputs = tokenizer(question, context, return_tensors="pt")
-        with torch.no_grad():
+
+        if args.run_config == "no_acc":
             outputs = model(**inputs)
+        elif args.run_config == "ort":
+            import onnxruntime
+            torch.export("onnx_model.onnx", model, inputs)
+            ort_session = onnxruntime.InferenceSession("onnx_model.onnx")
+            ort_inputs = {ort_session.get_inputs()[0].name: inputs["input_ids"].numpy(), ort_session.get_inputs()[1].name: inputs["attention_mask"].numpy()}
+            ort_outs = ort_session.run(None, ort_inputs)
+            outputs = (torch.tensor(ort_outs[0]), torch.tensor(ort_outs[1]))
 
         answer_start_index = outputs.start_logits.argmax()
         answer_end_index = outputs.end_logits.argmax()
