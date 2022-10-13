@@ -3,6 +3,7 @@ import time
 
 import torch
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer
+from optimum import ORTModelForQuestionAnswering
 import onnxruntime
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -21,6 +22,7 @@ def get_args(raw_args=None):
 
 def infer(args):
     model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
+    model = ORTModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
     model.load_state_dict(torch.load("pytorch_model.bin"))
 
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
