@@ -38,9 +38,9 @@ def infer(args):
     outputs = model(**inputs)
     end = time.time()
 
-    for output in outputs:
-        answer_start_index = output.start_logits.argmax()
-        answer_end_index = output.end_logits.argmax()
+    for i in range(len(questions)):
+        answer_start_index = outputs.start_logits[i].argmax()
+        answer_end_index = outputs.end_logits[i].argmax()
 
         predict_answer_tokens = inputs.input_ids[0, answer_start_index : answer_end_index + 1]
         prediction = tokenizer.decode(predict_answer_tokens)
