@@ -3,7 +3,7 @@ import time
 
 import torch
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer
-# import onnxruntime
+import onnxruntime
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -36,10 +36,11 @@ def infer(args):
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
 
     if args.run_config == "ort":
-        from onnxruntime import ORTModule
-        model = ORTModule(model)
-
-    output = model(input_ids, attention_mask=attention_mask)
+        torch.onnx.export(model, (input_ids, attention_mask), "model.onnx")
+        session = onnxruntime.InferenceSession('model.onnx')
+        output = session.run([None], inputs)
+    elif args.run_config == "no_acc":
+        output = model(input_ids, attention_mask=attention_mask)
     
     for i in range(len(questions)):
         max_start_logits = output.start_logits[i].argmax()
