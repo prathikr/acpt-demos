@@ -3,7 +3,7 @@ import time
 
 import torch
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer
-import onnxruntime
+# import onnxruntime
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -38,7 +38,7 @@ def infer(args):
     outputs = model(**inputs)
     end = time.time()
 
-    tmp = tokenizer.batch_decode(outputs)
+    tmp = tokenizer.decode(outputs)
     print(tmp)
 
     # for i in range(len(questions)):
