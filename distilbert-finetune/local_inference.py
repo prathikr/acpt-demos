@@ -39,7 +39,11 @@ def infer(args):
     sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
 
     input_name = sess.get_inputs()
-    print(input_name)
+    print("Input Name  :", input_name)
+
+    # First Output
+    output_name = sess.get_outputs()
+    print("Output Name  :", output_name)  
 
     start = time.time()
     if args.run_config == "ort":
