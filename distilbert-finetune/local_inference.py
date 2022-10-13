@@ -1,5 +1,6 @@
 import argparse
 import time
+import numpy as np
 
 import torch
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer
@@ -36,25 +37,12 @@ def infer(args):
     encoding = tokenizer.batch_encode_plus(inputs, padding=True, return_tensors="pt")
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
 
-    #torch.onnx.export(model, (input_ids, attention_mask), "model.onnx")
-    torch.onnx.export(model,                                         # model being run
-                  (input_ids,                            # model input (or a tuple for multiple inputs)
-                   attention_mask),                    
-                  "model.onnx",                                    # where to save the model (can be a file or file-like object)
-                  input_names=['input_ids',                       # the model's input names
-                               'input_mask'],                   
-                  output_names=['start_logits', "end_logits"])   # the model's output names
-                                
+    torch.onnx.export(model, (np.ascontiguousarray(input_ids.cpu().numpy()), np.ascontiguousarray(attention_mask.cpu().numpy())), "model.onnx", input_names=['input_ids', 'attention_mask'], output_names=['start_logits', "end_logits"])                       
     sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
-
-    model_inputs = {
-        'input_ids':   [input_ids], 
-        'input_mask':  [attention_mask]
-        }
 
     start = time.time()
     if args.run_config == "ort":
-        output = sess.run(['start_logits', 'end_logits'], model_inputs)
+        output = sess.run(['start_logits', 'end_logits'], {'input_ids': [input_ids], 'attention_mask':  [attention_mask]})
     elif args.run_config == "no_acc":
         output = model(input_ids, attention_mask=attention_mask)
     end = time.time()
