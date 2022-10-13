@@ -37,9 +37,7 @@ def infer(args):
             import onnxruntime
             torch.onnx.export("onnx_model.onnx", model, inputs)
             ort_session = onnxruntime.InferenceSession("onnx_model.onnx")
-            ort_inputs = {ort_session.get_inputs()[0].name: inputs["input_ids"].numpy(), ort_session.get_inputs()[1].name: inputs["attention_mask"].numpy()}
-            ort_outs = ort_session.run(None, ort_inputs)
-            outputs = (torch.tensor(ort_outs[0]), torch.tensor(ort_outs[1]))
+            outputs = ort_session.run(None, {'input': inputs})[0]
 
         answer_start_index = outputs.start_logits.argmax()
         answer_end_index = outputs.end_logits.argmax()
