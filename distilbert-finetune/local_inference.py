@@ -38,8 +38,8 @@ def infer(args):
 
     #torch.onnx.export(model, (input_ids, attention_mask), "model.onnx")
     torch.onnx.export(model,                                         # model being run
-                  (inputs['input_ids'],                            # model input (or a tuple for multiple inputs)
-                   inputs['attention_mask']),                    
+                  (input_ids,                            # model input (or a tuple for multiple inputs)
+                   attention_mask),                    
                   "model.onnx",                                    # where to save the model (can be a file or file-like object)
                   opset_version=11,                              # the ONNX version to export the model to
                   do_constant_folding=True,                      # whether to execute constant folding for optimization
