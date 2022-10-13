@@ -45,6 +45,7 @@ def infer(args):
         output = model(input_ids, attention_mask=attention_mask)
     end = time.time()
     
+    print("Context:", context)
     for i in range(len(questions)):
         max_start_logits = output.start_logits[i].argmax()
         max_end_logits = output.end_logits[i].argmax()
