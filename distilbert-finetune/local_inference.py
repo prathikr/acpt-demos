@@ -38,13 +38,12 @@ def infer(args):
             'input_ids': np.ascontiguousarray(input_ids.numpy()),
             'attention_mask' : np.ascontiguousarray(attention_mask.numpy()),
         }
-        # send data to GPU
-        #ort_input = ort_input.to(device)
 
     # send data to GPU
-    model.to(device)
-    input_ids = input_ids.to(device)
-    attention_mask = attention_mask.to(device)
+    if device == "cuda":
+        model = model.to(device)
+        input_ids = input_ids.to(device)
+        attention_mask = attention_mask.to(device)
 
     # run inference
     start = time.time()
