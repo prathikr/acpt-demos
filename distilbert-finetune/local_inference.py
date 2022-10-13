@@ -3,7 +3,6 @@ import time
 
 import torch
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer
-from optimum.onnxruntime import ORTModelForQuestionAnswering
 import onnxruntime
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -39,7 +38,7 @@ def infer(args):
     if args.run_config == "ort":
         torch.onnx.export(model, (input_ids, attention_mask), "model.onnx")
         sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
-        output = sess.run([None], {"input_ids": input_ids})
+        output = sess.run([None], {"input": (input_ids, attention_mask)})
     elif args.run_config == "no_acc":
         output = model(input_ids, attention_mask=attention_mask)
     
