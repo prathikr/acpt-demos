@@ -37,40 +37,33 @@ def infer(args):
     encoding = tokenizer.batch_encode_plus(inputs, padding=True, return_tensors="pt")
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
 
-    torch.onnx.export(model, (input_ids, attention_mask), "model.onnx", input_names=['input_ids', 'attention_mask'], output_names=['start_logits', "end_logits"])                       
-    sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
+    if args.run_config == "ort":
+        torch.onnx.export(model, (input_ids, attention_mask), "model.onnx", input_names=['input_ids', 'attention_mask'], output_names=['start_logits', "end_logits"])                       
+        sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
+        ort_input = {
+            'input_ids': np.ascontiguousarray(input_ids.cpu().numpy()),
+            'attention_mask' : np.ascontiguousarray(attention_mask.cpu().numpy()),
+        }
 
     start = time.time()
     if args.run_config == "ort":
-        ort_input = {
-              'input_ids': np.ascontiguousarray(input_ids.cpu().numpy()),
-              'attention_mask' : np.ascontiguousarray(attention_mask.cpu().numpy()),
-            }
         output = sess.run(None, ort_input)
     elif args.run_config == "no_acc":
         output = model(input_ids, attention_mask=attention_mask)
     end = time.time()
 
-    print("output: ", output)
-
     for i in range(len(questions)):
-        max_start_logits = output[0][i].argmax()
-        max_end_logits = output[1][i].argmax()
+        if args.run_config == "ort":
+            max_start_logits = output[0][i].argmax()
+            max_end_logits = output[1][i].argmax()
+        elif args.run_config == "no_acc":
+            max_start_logits = output.start_logits[i].argmax()
+            max_end_logits = output.end_logits[i].argmax()
         ans_tokens = input_ids[i][max_start_logits: max_end_logits + 1]
         answer_tokens = tokenizer.convert_ids_to_tokens(ans_tokens, skip_special_tokens=True)
         answer_tokens_to_string = tokenizer.convert_tokens_to_string(answer_tokens)
         print("Question: ", questions[i])
         print("Answer: ", answer_tokens_to_string)
-    
-    # print("Context:", context)
-    # for i in range(len(questions)):
-    #     max_start_logits = output.start_logits[i].argmax()
-    #     max_end_logits = output.end_logits[i].argmax()
-    #     ans_tokens = input_ids[i][max_start_logits: max_end_logits + 1]
-    #     answer_tokens = tokenizer.convert_ids_to_tokens(ans_tokens, skip_special_tokens=True)
-    #     answer_tokens_to_string = tokenizer.convert_tokens_to_string(answer_tokens)
-    #     print("Question: ", questions[i])
-    #     print("Answer: ", answer_tokens_to_string)
 
     print("Inference time: ", end - start, "seconds")
 
