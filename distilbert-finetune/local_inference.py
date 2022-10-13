@@ -32,7 +32,7 @@ def infer(args):
     for question in questions:
         inputs.append((question, context))
 
-    encoding = tokenizer.batch_encode_plus(inputs, pad_to_max_length=True, return_tensors="pt")
+    encoding = tokenizer.batch_encode_plus(inputs, padding=True, return_tensors="pt")
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
 
     if args.run_config == "ort":
