@@ -36,7 +36,7 @@ def infer(args):
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
 
     if args.run_config == "ort":
-        from optimum.onnxruntime import ORTModule
+        from onnxruntime import ORTModule
         model = ORTModule(model)
 
     output = model(input_ids, attention_mask=attention_mask)
