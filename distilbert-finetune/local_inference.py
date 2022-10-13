@@ -22,6 +22,7 @@ def get_args(raw_args=None):
 def infer(args):
     model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
     model.load_state_dict(torch.load("pytorch_model.bin"))
+    model.eval()
 
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
 
@@ -35,12 +36,22 @@ def infer(args):
     encoding = tokenizer.batch_encode_plus(inputs, padding=True, return_tensors="pt")
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
 
-    torch.onnx.export(model, (input_ids, attention_mask), "model.onnx")
+    #torch.onnx.export(model, (input_ids, attention_mask), "model.onnx")
+    torch.onnx.export(model,                                         # model being run
+                  (inputs['input_ids'],                            # model input (or a tuple for multiple inputs)
+                   inputs['attention_mask']),                    
+                  "model.onnx",                                    # where to save the model (can be a file or file-like object)
+                  opset_version=11,                              # the ONNX version to export the model to
+                  do_constant_folding=True,                      # whether to execute constant folding for optimization
+                  input_names=['input_ids',                       # the model's input names
+                               'input_mask'],                   
+                  output_names=['start_logits', "end_logits"])   # the model's output names
+                                
     sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
 
     model_inputs = {
         'input_ids':   [input_ids], 
-        'input_mask':  [attention_mask],
+        'input_mask':  [attention_mask]
         }
 
     start = time.time()
