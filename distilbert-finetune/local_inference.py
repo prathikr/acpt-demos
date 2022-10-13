@@ -18,34 +18,15 @@ def get_args(raw_args=None):
     args = parser.parse_args(raw_args)
     return args
 
-def preprocess_function(examples, tokenizer):
-    questions = [q.strip() for q in examples["question"]]
-    inputs = tokenizer(
-        questions,
-        examples["context"],
-        max_length=384,
-        truncation="only_second",
-        return_offsets_mapping=True,
-        padding="max_length",
-    )
-    return inputs
-
 def infer(args):
     model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
     model.load_state_dict(torch.load("pytorch_model.bin"))
 
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
 
-    context = "Architecturally, the school has a Catholic character. Atop the Main Building's gold dome is a golden statue of the Virgin Mary. Immediately in front of the Main Building and facing it, is a copper statue of Christ with arms upraised with the legend 'Venite Ad Me Omnes'. Next to the Main Building is the Basilica of the Sacred Heart. Immediately behind the basilica is the Grotto, a Marian place of prayer and reflection. It is a replica of the grotto at Lourdes, France where the Virgin Mary reputedly appeared to Saint Bernadette Soubirous in 1858. At the end of the main drive (and in a direct line that connects through 3 statues and the Gold Dome), is a simple, modern stone statue of Mary."
-
-    question1 = "To whom did the Virgin Mary allegedly appear in 1858 in Lourdes France?"
-    question2 = "What is in front of the Notre Dame Main Building?"
-    question3 = "The Basilica of the Sacred heart at Notre Dame is beside to which structure?"
-    question4 = "What is the Grotto at Notre Dame?"
-
-    data = [(question1, context1), (question2, context2)]
-
-    for question, context in data:
+    context = "Beyoncé Giselle Knowles-Carter (born September 4, 1981) is an American singer, songwriter, record producer and actress. Born and raised in Houston, Texas, she performed in various singing and dancing competitions as a child, and rose to fame in the late 1990s as lead singer of R&B girl-group Destiny\'s Child. Managed by her father, Mathew Knowles, the group became one of the world\'s best-selling girl groups of all time. Their hiatus saw the release of Beyoncé\'s debut album, Dangerously in Love (2003), which established her as a solo artist worldwide, earned five Grammy Awards and featured the Billboard Hot 100 number-one singles 'Crazy in Love' and 'Baby Boy'."
+    questions = ["When did Beyonce start becoming popular?", "What areas did Beyonce compete in when she was growing up?", "When did Beyonce leave Destiny's Child and become a solo singer?", "In what city and state did Beyonce grow up?"]
+    for question in questions:
         inputs = tokenizer(question, context, return_tensors="pt")
         with torch.no_grad():
             outputs = model(**inputs)
@@ -55,7 +36,8 @@ def infer(args):
 
         predict_answer_tokens = inputs.input_ids[0, answer_start_index : answer_end_index + 1]
         prediction = tokenizer.decode(predict_answer_tokens)
-        print(prediction)
+        print("Question: ", question)
+        print("Answer: ", prediction)
 
 def main(raw_args=None):
     args = get_args(raw_args)
