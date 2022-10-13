@@ -37,15 +37,15 @@ def infer(args):
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
     # start_logits, end_logits = model(input_ids, attention_mask=attention_mask)
     output = model(input_ids, attention_mask=attention_mask)
-    print(output)
-
-    for index,(start_score, end_score, input_id) in enumerate(zip(start_logits, end_logits, input_ids)):
-        max_startscore = torch.argmax(start_score)
-        max_endscore = torch.argmax(end_score)
-        ans_tokens = input_ids[index][max_startscore: max_endscore + 1]
+    for i in range(len(questions)):
+        start_logits = output.start_logits[i]
+        end_logits = output.end_logits[i]
+        max_startscore = torch.argmax(start_logits)
+        max_endscore = torch.argmax(end_logits)
+        ans_tokens = input_ids[i][max_startscore: max_endscore + 1]
         answer_tokens = tokenizer.convert_ids_to_tokens(ans_tokens, skip_special_tokens=True)
         answer_tokens_to_string = tokenizer.convert_tokens_to_string(answer_tokens)
-        print("Question: ", questions[index])
+        print("Question: ", questions[i])
         print("Answer: ", answer_tokens_to_string)
 
     # tokenizer_inputs = []
