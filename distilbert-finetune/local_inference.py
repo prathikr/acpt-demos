@@ -39,7 +39,7 @@ def infer(args):
             'attention_mask' : np.ascontiguousarray(attention_mask.numpy()),
         }
         # send data to GPU
-        ort_input = ort_input.to(device)
+        #ort_input = ort_input.to(device)
 
     # send data to GPU
     model.to(device)
