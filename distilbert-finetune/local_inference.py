@@ -37,7 +37,7 @@ def infer(args):
 
     if args.run_config == "ort":
         torch.onnx.export(model, (input_ids, attention_mask), "model.onnx")
-        session = onnxruntime.InferenceSession('model.onnx')
+        session = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
         output = session.run([None], inputs)
     elif args.run_config == "no_acc":
         output = model(input_ids, attention_mask=attention_mask)
