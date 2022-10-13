@@ -45,7 +45,7 @@ def infer(args):
         input_name = sess.get_inputs()[0].name
 
         # inference run using image_data as the input to the model 
-        output = sess.run([None], {"input_ids": input_ids, "attention_mask": attention_mask})[0]
+        output = sess.run([output_name], {"input": (input_ids, attention_mask)})[0]
     elif args.run_config == "no_acc":
         output = model(input_ids, attention_mask=attention_mask)
     
