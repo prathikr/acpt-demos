@@ -40,7 +40,7 @@ def infer(args):
 
     model_inputs = {
         'input_ids':   [input_ids], 
-        'attention_mask':  [attention_mask],
+        'input_mask':  [attention_mask],
         }
 
     start = time.time()
