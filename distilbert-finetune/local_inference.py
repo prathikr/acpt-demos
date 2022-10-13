@@ -40,10 +40,10 @@ def infer(args):
         }
 
     # send data to GPU
-    if device == "cuda":
-        model = model.to(device)
-        input_ids = input_ids.to(device)
-        attention_mask = attention_mask.to(device)
+    # if device == "cuda":
+    #     model = model.to(device)
+    #     input_ids = input_ids.to(device)
+    #     attention_mask = attention_mask.to(device)
 
     # run inference
     start = time.time()
