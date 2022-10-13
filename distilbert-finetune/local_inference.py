@@ -50,8 +50,8 @@ def infer(args):
     sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
 
     model_inputs = {
-        'input_ids':   [input_ids], 
-        'input_mask':  [attention_mask]
+        'input_ids':   input_ids, 
+        'input_mask':  attention_mask
         }
 
     start = time.time()
