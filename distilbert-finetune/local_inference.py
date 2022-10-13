@@ -38,14 +38,8 @@ def infer(args):
     if args.run_config == "ort":
         torch.onnx.export(model, (input_ids, attention_mask), "model.onnx")
         sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
-        # get the outputs metadata as a list of :class:`onnxruntime.NodeArg`
-        output_name = sess.get_outputs()[0].name
-
-        # get the inputs metadata as a list of :class:`onnxruntime.NodeArg`
-        input_name = sess.get_inputs()[0].name
-
         # inference run using image_data as the input to the model 
-        output = sess.run([output_name], {"input": (input_ids, attention_mask)})[0]
+        output = sess.run([None], {"input_ids": input_ids, "attention_mask": attention_mask})
     elif args.run_config == "no_acc":
         output = model(input_ids, attention_mask=attention_mask)
     
