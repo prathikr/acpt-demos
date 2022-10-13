@@ -21,8 +21,7 @@ def get_args(raw_args=None):
     return args
 
 def infer(args):
-    model = AutoModelForQuestionAnswering.from_pretrained("pytorch_model.bin")
-    model = ORTModelForQuestionAnswering.from_pretrained("distilbert-base-uncased", from_transofrmers=True)
+    model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
     model.load_state_dict(torch.load("pytorch_model.bin"))
 
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
@@ -40,8 +39,7 @@ def infer(args):
     if args.run_config == "ort":
         torch.onnx.export(model, (input_ids, attention_mask), "model.onnx")
         sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
-        # inference run using image_data as the input to the model 
-        output = sess.run([None], {"input_ids": input_ids, "attention_mask": attention_mask})
+        output = sess.run([None], {"input_ids": input_ids})
     elif args.run_config == "no_acc":
         output = model(input_ids, attention_mask=attention_mask)
     

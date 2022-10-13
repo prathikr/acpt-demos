@@ -97,6 +97,7 @@ def main(
         "weight_decay": 0.01,
         "fp16": True,
         "deepspeed": "ds_config_zero_1.json" if deepspeed else None,
+        "output_dir": "model/onnxruntime"
     }
 
     # initialize training arguments
