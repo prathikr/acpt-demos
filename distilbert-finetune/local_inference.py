@@ -33,17 +33,11 @@ def infer(args):
     # if using onnnxruntime, convert to onnx format
     if args.ort:
         torch.onnx.export(model, (input_ids, attention_mask), "model.onnx", input_names=['input_ids', 'attention_mask'], output_names=['start_logits', "end_logits"])                       
-        sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
+        sess = onnxruntime.InferenceSession('model.onnx')
         ort_input = {
             'input_ids': np.ascontiguousarray(input_ids.numpy()),
             'attention_mask' : np.ascontiguousarray(attention_mask.numpy()),
         }
-
-    # send data to GPU
-    # if device == "cuda":
-    #     model = model.to(device)
-    #     input_ids = input_ids.to(device)
-    #     attention_mask = attention_mask.to(device)
 
     # run inference
     start = time.time()
