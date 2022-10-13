@@ -33,7 +33,7 @@ def infer(args):
     for question in questions:
         inputs.append((question, context))
 
-    encoding = tokenizer.batch_encode_plus(inputs, padding=True, return_tensors="np")
+    encoding = tokenizer.batch_encode_plus(inputs, padding=True, return_tensors="pt")
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
 
     #torch.onnx.export(model, (input_ids, attention_mask), "model.onnx")
