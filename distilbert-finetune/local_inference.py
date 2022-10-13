@@ -30,18 +30,17 @@ def infer(args):
     # tokenize test data
     encoding = tokenizer.batch_encode_plus(inputs, padding=True, return_tensors="pt")
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
+    input_ids = input_ids.to(device)
+    attention_mask = attention_mask.to(device)
 
     # if using onnnxruntime, convert to onnx format
     if args.ort:
         torch.onnx.export(model, (input_ids, attention_mask), "model.onnx", input_names=['input_ids', 'attention_mask'], output_names=['start_logits', "end_logits"])                       
         sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
         ort_input = {
-            'input_ids': np.ascontiguousarray(input_ids.cuda().numpy()),
-            'attention_mask' : np.ascontiguousarray(attention_mask.cuda().numpy()),
+            'input_ids': np.ascontiguousarray(input_ids.numpy()),
+            'attention_mask' : np.ascontiguousarray(attention_mask.numpy()),
         }
-    else:
-        input_ids = input_ids.to(device)
-        attention_mask = attention_mask.to(device)
 
     # run inference
     start = time.time()
