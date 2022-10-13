@@ -33,7 +33,7 @@ def infer(args):
     for question in questions:
         tokenizer_inputs.append((question, context))
 
-    inputs = tokenizer(tokenizer_inputs, return_tensors="pt")
+    inputs = tokenizer(tokenizer_inputs, return_tensors="pt", padding=True)
     start = time.time()
     outputs = model(**inputs)
     end = time.time()
