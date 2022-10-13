@@ -3,7 +3,7 @@ import time
 
 import torch
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer
-from optimum import ORTModelForQuestionAnswering
+from optimum.onnxruntime import ORTModelForQuestionAnswering
 import onnxruntime
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
