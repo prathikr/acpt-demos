@@ -5,8 +5,8 @@ import numpy as np
 import torch
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer
 import onnxruntime
-onnxruntime.set_default_logger_severity(3) # disable warnings
-
+import warnings
+warnings.filterwarnings("ignore")
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
