@@ -54,7 +54,7 @@ def infer(args):
 
     start = time.time()
     if args.run_config == "ort":
-        output = sess.run([None], {"input": [input_ids, attention_mask]})
+        output = sess.run([None], {"input_ids": input_ids, "attention_mask": attention_mask})
     elif args.run_config == "no_acc":
         output = model(input_ids, attention_mask=attention_mask)
     end = time.time()
