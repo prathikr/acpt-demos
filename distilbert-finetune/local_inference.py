@@ -14,6 +14,7 @@ def infer(args):
     model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
     model.load_state_dict(torch.load("pytorch_model.bin"))
     model.eval()
+    model.to(device)
 
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
 
@@ -29,14 +30,16 @@ def infer(args):
     # tokenize test data
     encoding = tokenizer.batch_encode_plus(inputs, padding=True, return_tensors="pt")
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
+    input_ids = input_ids.to(device)
+    attention_mask = attention_mask.to(device)
 
     # if using onnnxruntime, convert to onnx format
     if args.ort:
         torch.onnx.export(model, (input_ids, attention_mask), "model.onnx", input_names=['input_ids', 'attention_mask'], output_names=['start_logits', "end_logits"])                       
         sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
         ort_input = {
-            'input_ids': np.ascontiguousarray(input_ids.cpu().numpy()),
-            'attention_mask' : np.ascontiguousarray(attention_mask.cpu().numpy()),
+            'input_ids': np.ascontiguousarray(input_ids.cuda().numpy()),
+            'attention_mask' : np.ascontiguousarray(attention_mask.cuda().numpy()),
         }
 
     # run inference
@@ -48,6 +51,7 @@ def infer(args):
     end = time.time()
 
     # postprocess test data
+    print("Context: ", context)
     for i in range(len(questions)):
         if args.ort:
             max_start_logits = output[0][i].argmax()
