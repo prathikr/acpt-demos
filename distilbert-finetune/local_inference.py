@@ -35,7 +35,9 @@ def infer(args):
 
     encoding = tokenizer.batch_encode_plus(inputs, pad_to_max_length=True, return_tensors="pt")
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
-    start_logits, end_logits = model(input_ids, attention_mask=attention_mask)
+    # start_logits, end_logits = model(input_ids, attention_mask=attention_mask)
+    output = model(input_ids, attention_mask=attention_mask)
+    print(output)
 
     for index,(start_score, end_score, input_id) in enumerate(zip(start_logits, end_logits, input_ids)):
         max_startscore = torch.argmax(start_score)
