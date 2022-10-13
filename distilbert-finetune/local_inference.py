@@ -26,7 +26,6 @@ def infer(args):
     if args.run_config == "no_acc":
         model.eval()
     else:
-        from
         model = ORTModule(model)
 
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
