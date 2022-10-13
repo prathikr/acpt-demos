@@ -22,7 +22,12 @@ def get_args(raw_args=None):
 def infer(args):
     model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
     model.load_state_dict(torch.load("pytorch_model.bin"))
-    model.eval()
+
+    if args.run_config == "no_acc":
+        model.eval()
+    else:
+        from
+        model = ORTModule(model)
 
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
 
@@ -35,58 +40,17 @@ def infer(args):
 
     encoding = tokenizer.batch_encode_plus(inputs, pad_to_max_length=True, return_tensors="pt")
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
-    # start_logits, end_logits = model(input_ids, attention_mask=attention_mask)
     output = model(input_ids, attention_mask=attention_mask)
     for i in range(len(questions)):
-        start_logits = output.start_logits[i]
-        end_logits = output.end_logits[i]
-        max_startscore = torch.argmax(start_logits)
-        max_endscore = torch.argmax(end_logits)
+        max_startscore = output.start_logits[i].argmax()
+        max_endscore = output.end_logits[i].argmax()
+        # max_startscore = torch.argmax(start_logits)
+        # max_endscore = torch.argmax(end_logits)
         ans_tokens = input_ids[i][max_startscore: max_endscore + 1]
         answer_tokens = tokenizer.convert_ids_to_tokens(ans_tokens, skip_special_tokens=True)
         answer_tokens_to_string = tokenizer.convert_tokens_to_string(answer_tokens)
         print("Question: ", questions[i])
         print("Answer: ", answer_tokens_to_string)
-
-    # tokenizer_inputs = []
-    # for question in questions:
-    #     tokenizer_inputs.append([question, context])
-
-    # inputs = tokenizer(tokenizer_inputs, return_tensors="pt", padding=True)
-    # start = time.time()
-    # outputs = model(**inputs)
-    # end = time.time()
-
-    # for i in range(len(questions)):
-    #     answer_start_index = outputs.start_logits[i].argmax()
-    #     answer_end_index = outputs.end_logits[i].argmax()
-
-    #     predict_answer_tokens = inputs.input_ids[0, answer_start_index : answer_end_index + 1]
-    #     prediction = tokenizer.decode(predict_answer_tokens)
-    #     print("Question: ", question)
-    #     print("Answer: ", prediction)
-
-
-    # print("Context: ", context)
-    # total_inferencing_time = 0
-    # for question in questions:
-    #     inputs = tokenizer(question, context, return_tensors="pt")
-
-    #     start = time.time()
-    #     outputs = model(**inputs)
-    #     end = time.time()
-
-    #     total_inferencing_time += end - start
-
-    #     answer_start_index = outputs.start_logits.argmax()
-    #     answer_end_index = outputs.end_logits.argmax()
-
-    #     predict_answer_tokens = inputs.input_ids[0, answer_start_index : answer_end_index + 1]
-    #     prediction = tokenizer.decode(predict_answer_tokens)
-    #     print("Question: ", question)
-    #     print("Answer: ", prediction)
-
-    # print("Total inferencing time: ", total_inferencing_time)
 
 def main(raw_args=None):
     args = get_args(raw_args)
