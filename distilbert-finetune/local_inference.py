@@ -35,7 +35,7 @@ def infer(args):
             outputs = model(**inputs)
         elif args.run_config == "ort":
             import onnxruntime
-            torch.export("onnx_model.onnx", model, inputs)
+            torch.onnx.export("onnx_model.onnx", model, inputs)
             ort_session = onnxruntime.InferenceSession("onnx_model.onnx")
             ort_inputs = {ort_session.get_inputs()[0].name: inputs["input_ids"].numpy(), ort_session.get_inputs()[1].name: inputs["attention_mask"].numpy()}
             ort_outs = ort_session.run(None, ort_inputs)
