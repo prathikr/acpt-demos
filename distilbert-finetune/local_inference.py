@@ -50,6 +50,8 @@ def infer(args):
     elif args.run_config == "no_acc":
         output = model(input_ids, attention_mask=attention_mask)
     end = time.time()
+
+    print("output: ", output)
     
     print("Context:", context)
     for i in range(len(questions)):
