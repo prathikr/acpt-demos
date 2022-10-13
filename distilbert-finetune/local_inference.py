@@ -35,10 +35,11 @@ def infer(args):
     encoding = tokenizer.batch_encode_plus(inputs, padding=True, return_tensors="pt")
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
 
+    torch.onnx.export(model, (input_ids, attention_mask), "model.onnx")
+    sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
+
     start = time.time()
     if args.run_config == "ort":
-        torch.onnx.export(model, (input_ids, attention_mask), "model.onnx")
-        sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
         output = sess.run([None], {"input": (input_ids, attention_mask)})
     elif args.run_config == "no_acc":
         output = model(input_ids, attention_mask=attention_mask)
