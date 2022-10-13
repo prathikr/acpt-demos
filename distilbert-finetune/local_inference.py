@@ -30,14 +30,14 @@ def infer(args):
     questions = ["When was Beyonce born?", "What areas did Beyonce compete in when she was growing up?", "When did Beyonce leave Destiny's Child and become a solo singer?", "What was the name of Beyonce's debut album?"]
     
     inputs = []
-    for question in questions :
+    for question in questions:
         inputs.append((question, context))
 
     encoding = tokenizer.batch_encode_plus(inputs, pad_to_max_length=True, return_tensors="pt")
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
-    start_scores, end_scores = model(input_ids, attention_mask=attention_mask)
+    start_logits, end_logits = model(input_ids, attention_mask=attention_mask)
 
-    for index,(start_score, end_score, input_id) in enumerate(zip(start_scores, end_scores, input_ids)):
+    for index,(start_score, end_score, input_id) in enumerate(zip(start_logits, end_logits, input_ids)):
         max_startscore = torch.argmax(start_score)
         max_endscore = torch.argmax(end_score)
         ans_tokens = input_ids[index][max_startscore: max_endscore + 1]
