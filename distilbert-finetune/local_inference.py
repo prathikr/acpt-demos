@@ -52,16 +52,25 @@ def infer(args):
     end = time.time()
 
     print("output: ", output)
-    
-    print("Context:", context)
+
     for i in range(len(questions)):
-        max_start_logits = output.start_logits[i].argmax()
-        max_end_logits = output.end_logits[i].argmax()
+        max_start_logits = output[0][i].argmax()
+        max_end_logits = output[1][i].argmax()
         ans_tokens = input_ids[i][max_start_logits: max_end_logits + 1]
         answer_tokens = tokenizer.convert_ids_to_tokens(ans_tokens, skip_special_tokens=True)
         answer_tokens_to_string = tokenizer.convert_tokens_to_string(answer_tokens)
         print("Question: ", questions[i])
         print("Answer: ", answer_tokens_to_string)
+    
+    # print("Context:", context)
+    # for i in range(len(questions)):
+    #     max_start_logits = output.start_logits[i].argmax()
+    #     max_end_logits = output.end_logits[i].argmax()
+    #     ans_tokens = input_ids[i][max_start_logits: max_end_logits + 1]
+    #     answer_tokens = tokenizer.convert_ids_to_tokens(ans_tokens, skip_special_tokens=True)
+    #     answer_tokens_to_string = tokenizer.convert_tokens_to_string(answer_tokens)
+    #     print("Question: ", questions[i])
+    #     print("Answer: ", answer_tokens_to_string)
 
     print("Inference time: ", end - start, "seconds")
 
