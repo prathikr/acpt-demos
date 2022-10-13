@@ -37,12 +37,16 @@ def infer(args):
     encoding = tokenizer.batch_encode_plus(inputs, padding=True, return_tensors="pt")
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
 
-    torch.onnx.export(model, (np.ascontiguousarray(input_ids.cpu().numpy()), np.ascontiguousarray(attention_mask.cpu().numpy())), "model.onnx", input_names=['input_ids', 'attention_mask'], output_names=['start_logits', "end_logits"])                       
+    torch.onnx.export(model, (input_ids, attention_mask), "model.onnx") #, input_names=['input_ids', 'attention_mask'], output_names=['start_logits', "end_logits"])                       
     sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
 
     start = time.time()
     if args.run_config == "ort":
-        output = sess.run(['start_logits', 'end_logits'], {'input_ids': [input_ids], 'attention_mask':  [attention_mask]})
+        ort_input = {
+              'input_ids': np.ascontiguousarray(input_ids.cpu().numpy()),
+              'attention_mask' : np.ascontiguousarray(attention_mask.cpu().numpy()),
+            }
+        output = sess.run(None, ort_input)
     elif args.run_config == "no_acc":
         output = model(input_ids, attention_mask=attention_mask)
     end = time.time()
