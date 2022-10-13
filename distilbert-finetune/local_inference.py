@@ -38,23 +38,14 @@ def infer(args):
     torch.onnx.export(model, (input_ids, attention_mask), "model.onnx")
     sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
 
-    input_name = sess.get_inputs()[0].name
-    print("Input Name 0:", input_name)
-
-    input_name = sess.get_inputs()[1].name
-    print("Input Name 1:", input_name)
-
-    # First Output
-    output_name = sess.get_outputs()[0].name
-    print("Output Name 0:", output_name)  
-
-    output_name = sess.get_outputs()[1].name
-    print("Output Name 1:", output_name)  
-
+    model_inputs = {
+        'input_ids':   [input_ids], 
+        'attention_mask':  [attention_mask],
+        }
 
     start = time.time()
     if args.run_config == "ort":
-        output = sess.run([None], {"input_ids": input_ids, "attention_mask": attention_mask})
+        output = sess.run(['start_logits', 'end_logits'], model_inputs)
     elif args.run_config == "no_acc":
         output = model(input_ids, attention_mask=attention_mask)
     end = time.time()
