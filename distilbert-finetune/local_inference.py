@@ -37,7 +37,7 @@ def infer(args):
     encoding = tokenizer.batch_encode_plus(inputs, padding=True, return_tensors="pt")
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
 
-    torch.onnx.export(model, (input_ids, attention_mask), "model.onnx") #, input_names=['input_ids', 'attention_mask'], output_names=['start_logits', "end_logits"])                       
+    torch.onnx.export(model, (input_ids, attention_mask), "model.onnx", input_names=['input_ids', 'attention_mask'], output_names=['start_logits', "end_logits"])                       
     sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
 
     start = time.time()
