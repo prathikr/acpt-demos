@@ -21,7 +21,7 @@ def get_args(raw_args=None):
     return args
 
 def infer(args):
-    model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
+    model = AutoModelForQuestionAnswering.from_pretrained("pytorch_model.bin")
     model = ORTModelForQuestionAnswering.from_pretrained("distilbert-base-uncased", from_transofrmers=True)
     model.load_state_dict(torch.load("pytorch_model.bin"))
 
