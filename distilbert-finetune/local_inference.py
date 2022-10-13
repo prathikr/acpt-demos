@@ -41,8 +41,6 @@ def infer(args):
                   (input_ids,                            # model input (or a tuple for multiple inputs)
                    attention_mask),                    
                   "model.onnx",                                    # where to save the model (can be a file or file-like object)
-                  opset_version=11,                              # the ONNX version to export the model to
-                  do_constant_folding=True,                      # whether to execute constant folding for optimization
                   input_names=['input_ids',                       # the model's input names
                                'input_mask'],                   
                   output_names=['start_logits', "end_logits"])   # the model's output names
