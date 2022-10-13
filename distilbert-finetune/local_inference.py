@@ -23,11 +23,6 @@ def infer(args):
     model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
     model.load_state_dict(torch.load("pytorch_model.bin"))
 
-    if args.run_config == "no_acc":
-        model.eval()
-    else:
-        model = ORTModule(model)
-
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
 
     context = "Beyonce Giselle Knowles-Carter (born September 4, 1981) is an American singer, songwriter, record producer and actress. Born and raised in Houston, Texas, she performed in various singing and dancing competitions as a child, and rose to fame in the late 1990s as lead singer of R&B girl-group Destiny's Child. Managed by her father, Mathew Knowles, the group became one of the world's best-selling girl groups of all time. Their hiatus saw the release of Beyoncé's debut album, Dangerously in Love (2003), which established her as a solo artist worldwide, earned five Grammy Awards and featured the Billboard Hot 100 number-one singles 'Crazy in Love' and 'Baby Boy'."
@@ -41,11 +36,9 @@ def infer(args):
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
     output = model(input_ids, attention_mask=attention_mask)
     for i in range(len(questions)):
-        max_startscore = output.start_logits[i].argmax()
-        max_endscore = output.end_logits[i].argmax()
-        # max_startscore = torch.argmax(start_logits)
-        # max_endscore = torch.argmax(end_logits)
-        ans_tokens = input_ids[i][max_startscore: max_endscore + 1]
+        max_start_logits = output.start_logits[i].argmax()
+        max_end_logits = output.end_logits[i].argmax()
+        ans_tokens = input_ids[i][max_start_logits: max_end_logits + 1]
         answer_tokens = tokenizer.convert_ids_to_tokens(ans_tokens, skip_special_tokens=True)
         answer_tokens_to_string = tokenizer.convert_tokens_to_string(answer_tokens)
         print("Question: ", questions[i])
