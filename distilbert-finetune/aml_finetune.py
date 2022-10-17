@@ -59,6 +59,7 @@ def main(raw_args=None):
     }
 
     # define the command
+    # documentation: https://learn.microsoft.com/en-us/python/api/azure-ai-ml/azure.ai.ml.entities.command?view=azure-python
     command_job = command(
         description="ACPT DistilBERT Finetune Demo",
         display_name=f"distilbert-finetune-{args.run_config}",
