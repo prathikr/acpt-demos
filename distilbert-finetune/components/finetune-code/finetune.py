@@ -102,14 +102,21 @@ def main(
     # initialize training arguments
     training_args = TrainingArguments(**training_args_dict)
 
+    from transformers import Trainer
+    trainer_class = Trainer
+
     if ort:
-        from optimum.onnxruntime import ORTTrainer
+        from onnxruntime.training import ORTModule
+        model = ORTModule(model)
 
-        trainer_class = ORTTrainer
-    else:
-        from transformers import Trainer
+    # if ort:
+    #     from optimum.onnxruntime import ORTTrainer
 
-        trainer_class = Trainer
+    #     trainer_class = ORTTrainer
+    # else:
+    #     from transformers import Trainer
+
+    #     trainer_class = Trainer
 
     # Initialize Trainer
     trainer = trainer_class(
