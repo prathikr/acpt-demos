@@ -15,7 +15,6 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError("Boolean value expected.")
 
-# adapted from https://huggingface.co/docs/transformers/tasks/question_answering
 def preprocess_function(examples, tokenizer=None):
     questions = [q.strip() for q in examples["question"]]
     inputs = tokenizer(
@@ -67,6 +66,8 @@ def preprocess_function(examples, tokenizer=None):
     inputs["end_positions"] = end_positions
     return inputs
 
+# NOTE: More detailed instructions on preprocess/training can be found at
+# https://huggingface.co/docs/transformers/tasks/question_answering
 def main(
     ort: bool,
     deepspeed: bool,
