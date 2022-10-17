@@ -15,8 +15,6 @@ def infer(args):
     model.load_state_dict(torch.load("pytorch_model.bin"))
     model.eval()
 
-    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-
     # load test data
     context = "Beyonce Giselle Knowles-Carter (born September 4, 1981) is an American singer, songwriter, record producer and actress. Born and raised in Houston, Texas, she performed in various singing and dancing competitions as a child, and rose to fame in the late 1990s as lead singer of R&B girl-group Destiny's Child. Managed by her father, Mathew Knowles, the group became one of the world's best-selling girl groups of all time. Their hiatus saw the release of Beyoncé's debut album, Dangerously in Love (2003), which established her as a solo artist worldwide, earned five Grammy Awards and featured the Billboard Hot 100 number-one singles 'Crazy in Love' and 'Baby Boy'."
     questions = ["When was Beyonce born?", "What areas did Beyonce compete in when she was growing up?", "When did Beyonce leave Destiny's Child and become a solo singer?", "What was the name of Beyonce's debut album?"]
@@ -27,6 +25,7 @@ def infer(args):
         inputs.append((question, context))
 
     # tokenize test data
+    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
     encoding = tokenizer.batch_encode_plus(inputs, padding=True, return_tensors="pt")
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
 

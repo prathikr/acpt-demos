@@ -15,6 +15,7 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError("Boolean value expected.")
 
+# adapted from https://huggingface.co/docs/transformers/tasks/question_answering
 def preprocess_function(examples, tokenizer=None):
     questions = [q.strip() for q in examples["question"]]
     inputs = tokenizer(
