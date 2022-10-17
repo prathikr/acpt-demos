@@ -3,7 +3,7 @@ from pathlib import Path
 
 from azureml.core.run import Run
 from datasets import load_dataset
-from transformers import AutoModelForQuestionAnswering, AutoTokenizer, TrainingArguments, DefaultDataCollator
+from transformers import AutoModelForQuestionAnswering, AutoTokenizer, TrainingArguments, Trainer, DefaultDataCollator
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -86,6 +86,7 @@ def main(
     data_collator = DefaultDataCollator()
     model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
 
+    # initialize training arguments
     training_args_dict = {
         "output_dir": ".outputs",
         "do_train": True,
@@ -98,28 +99,14 @@ def main(
         "fp16": True,
         "deepspeed": "ds_config_zero_1.json" if deepspeed else None,
     }
-
-    # initialize training arguments
     training_args = TrainingArguments(**training_args_dict)
-
-    from transformers import Trainer
-    trainer_class = Trainer
 
     if ort:
         from onnxruntime.training import ORTModule
         model = ORTModule(model)
 
-    # if ort:
-    #     from optimum.onnxruntime import ORTTrainer
-
-    #     trainer_class = ORTTrainer
-    # else:
-    #     from transformers import Trainer
-
-    #     trainer_class = Trainer
-
     # Initialize Trainer
-    trainer = trainer_class(
+    trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=tokenized_squad["train"],
