@@ -10,14 +10,23 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 print("device: ", device)
 
 def infer(args):
-    # load pretrained model
+    # load model and update state dictionary
     model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
     model.load_state_dict(torch.load("pytorch_model.bin"))
     model.eval()
 
     # load test data
-    context = "Beyonce Giselle Knowles-Carter (born September 4, 1981) is an American singer, songwriter, record producer and actress. Born and raised in Houston, Texas, she performed in various singing and dancing competitions as a child, and rose to fame in the late 1990s as lead singer of R&B girl-group Destiny's Child. Managed by her father, Mathew Knowles, the group became one of the world's best-selling girl groups of all time. Their hiatus saw the release of Beyoncé's debut album, Dangerously in Love (2003), which established her as a solo artist worldwide, earned five Grammy Awards and featured the Billboard Hot 100 number-one singles 'Crazy in Love' and 'Baby Boy'."
-    questions = ["When was Beyonce born?", "What areas did Beyonce compete in when she was growing up?", "When did Beyonce leave Destiny's Child and become a solo singer?", "What was the name of Beyonce's debut album?"]
+    context = "Beyonce Giselle Knowles-Carter (born September 4, 1981) is an American singer, songwriter, record producer and actress. \
+               Born and raised in Houston, Texas, she performed in various singing and dancing competitions as a child, and rose to fame \
+               in the late 1990s as lead singer of R&B girl-group Destiny's Child. Managed by her father, Mathew Knowles, the group became \
+               one of the world's best-selling girl groups of all time. Their hiatus saw the release of Beyoncé's debut album, Dangerously \
+               in Love (2003), which established her as a solo artist worldwide, earned five Grammy Awards and featured the Billboard Hot \
+               100 number-one singles 'Crazy in Love' and 'Baby Boy'."
+
+    questions = ["When was Beyonce born?", 
+                 "What areas did Beyonce compete in when she was growing up?", 
+                 "When did Beyonce leave Destiny's Child and become a solo singer?", 
+                 "What was the name of Beyonce's debut album?"]
 
     # preprocess test data
     inputs = []
@@ -30,8 +39,16 @@ def infer(args):
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
 
     # if using onnnxruntime, convert to onnx format
+    # documentation: https://onnxruntime.ai/docs/api/python/api_summary.html
+    # ...more documentation: https://github.com/microsoft/onnxruntime/blob/main/onnxruntime/python/tools/transformers/notebooks/Inference_GPT2-OneStepSearch_OnnxRuntime_CPU.ipynb
+
     if args.ort:
-        torch.onnx.export(model, (input_ids, attention_mask), "model.onnx", input_names=['input_ids', 'attention_mask'], output_names=['start_logits', "end_logits"])                       
+        torch.onnx.export(model, \
+                          (input_ids, attention_mask), \
+                          "model.onnx", \
+                          input_names=['input_ids', 'attention_mask'], \
+                          output_names=['start_logits', "end_logits"]) 
+
         sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
         ort_input = {
             'input_ids': np.ascontiguousarray(input_ids.numpy()),

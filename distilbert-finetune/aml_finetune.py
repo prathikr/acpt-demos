@@ -5,16 +5,14 @@ from azure.ai.ml import MLClient, command
 from azure.ai.ml.entities import BuildContext, Environment
 from azure.identity import AzureCliCredential
 
-
 def run_config_to_args(run_config):
     mapping = {
         "no_acc": [],
-        "ds": ["--deepspeed", "True"],
-        "ort": ["--ort", "True"],
-        "ds_ort": ["--deepspeed", "True", "--ort", "True"],
+        "ds": ["--deepspeed"],
+        "ort": ["--ort"],
+        "ds_ort": ["--deepspeed", "--ort"],
     }
     return mapping[run_config]
-
 
 def get_args(raw_args=None):
     parser = argparse.ArgumentParser(description="DistilBERT Finetune AML job submission")
@@ -24,7 +22,7 @@ def get_args(raw_args=None):
         "--ws_config",
         type=str,
         required=True,
-        help="Workspace configuration. Path is absolute or relative to where script is called from",
+        help="Workspace configuration json file with subscription id, resource group, and workspace name",
     )
     parser.add_argument("--compute", type=str, required=True, help="Compute target to run job on")
 
@@ -35,6 +33,7 @@ def get_args(raw_args=None):
 
     # parse args, extra_args used for job configuration
     args = parser.parse_args(raw_args)
+    print(f"input parameters {vars(args)}")
     return args
 
 
@@ -46,10 +45,10 @@ def main(raw_args=None):
     component_dir = root_dir / "components"
 
     # connect to the workspace
+    # documentation: https://learn.microsoft.com/en-us/python/api/azure-ai-ml/azure.ai.ml.mlclient?view=azure-python
     ws_config_path = root_dir / args.ws_config
     ml_client = MLClient.from_config(credential=AzureCliCredential(), path=ws_config_path)
 
-    # code directory
     code_dir = component_dir / "finetune-code"
     environment_dir = component_dir / "environment"
 

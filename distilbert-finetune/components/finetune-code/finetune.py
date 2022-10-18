@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+import os
 
 from azureml.core.run import Run
 from datasets import load_dataset
@@ -14,6 +15,16 @@ def str2bool(v):
         return False
     else:
         raise argparse.ArgumentTypeError("Boolean value expected.")
+
+def get_args(raw_args=None):
+    parser = argparse.ArgumentParser(description="DistilBERT Fine-Tuning")
+
+    parser.add_argument("--ort", type=str2bool, default=False, help="Use ORTModule")
+    parser.add_argument("--deepspeed", type=str2bool, default=False, help="Use deepspeed")
+
+    args = parser.parse_args(raw_args)
+    print(f"input parameters {vars(args)}")
+    return args
 
 def preprocess_function(examples, tokenizer=None):
     questions = [q.strip() for q in examples["question"]]
@@ -66,31 +77,30 @@ def preprocess_function(examples, tokenizer=None):
     inputs["end_positions"] = end_positions
     return inputs
 
-# NOTE: More detailed instructions on preprocess/training can be found at
-# https://huggingface.co/docs/transformers/tasks/question_answering
-def main(
-    ort: bool,
-    deepspeed: bool,
-):
-
-    import os
+# NOTE: Training pipeline adapted from https://huggingface.co/docs/transformers/tasks/question_answering
+def main(raw_args=None):
+    args = get_args(raw_args)
 
     rank = os.environ.get("RANK", -1)
-    assert rank != -1
-    cache_dir = f".cache_{rank}"
+    assert rank != -1, "RANK environment variable not set"
 
-    # Load the SQuAD dataset from the Huggingface Datasets library
+    # load the SQuAD dataset from the Huggingface Datasets library
     squad = load_dataset("squad")
 
-    # Load pretrained model and tokenizer
+    # load pretrained model and tokenizer
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-    tokenized_squad = squad.map(preprocess_function, fn_kwargs={"tokenizer": tokenizer}, batched=True, remove_columns=squad["train"].column_names)
-    data_collator = DefaultDataCollator()
     model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
+
+    if args.ort:
+        from onnxruntime.training import ORTModule
+        model = ORTModule(model)
+
+    # tokenize the data
+    tokenized_squad = squad.map(preprocess_function, fn_kwargs={"tokenizer": tokenizer}, batched=True, remove_columns=squad["train"].column_names)
 
     # initialize training arguments
     training_args_dict = {
-        "output_dir": ".outputs",
+        "output_dir": ".outputs", # for intermediary checkpoints
         "do_train": True,
         "do_eval": True,
         "per_device_train_batch_size": 16,
@@ -103,10 +113,6 @@ def main(
     }
     training_args = TrainingArguments(**training_args_dict)
 
-    if ort:
-        from onnxruntime.training import ORTModule
-        model = ORTModule(model)
-
     # Initialize Trainer
     trainer = Trainer(
         model=model,
@@ -115,12 +121,13 @@ def main(
         eval_dataset=tokenized_squad["validation"],
         tokenizer=tokenizer,
         # Data collator will default to DataCollatorWithPadding, so we change it.
-        data_collator=data_collator,
+        data_collator=DefaultDataCollator(),
     )
 
     # train
     train_result = trainer.train()
 
+    # extract performance metrics
     train_metrics = train_result.metrics
     train_metrics["train_samples"] = len(tokenized_squad["train"])
     trainer.log_metrics("train", train_metrics)
@@ -138,20 +145,10 @@ def main(
         tokenizer.save_pretrained(trained_model_path / "tokenizer")
         model.save_pretrained(trained_model_path / "weights")
 
-        # register model
+        # upload saved data to AML
+        # documentation: https://learn.microsoft.com/en-us/python/api/azureml-core/azureml.core.run(class)?view=azure-ml-py
         run = Run.get_context()
         run.upload_folder(name="model", path=trained_model_folder)
-        run.register_model(model_name="acpt-distilbert", model_path=trained_model_folder)
-
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="DistilBERT Fine-Tuning")
-
-    parser.add_argument("--ort", type=str2bool, default=False, help="Use ORTModule")
-    parser.add_argument("--deepspeed", type=str2bool, default=False, help="Use deepspeed")
-
-    args = parser.parse_args()
-
-    print(f"input parameters {vars(args)}")
-
-    main(**vars(args))
+    main()
