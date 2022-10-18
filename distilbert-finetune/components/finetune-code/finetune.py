@@ -6,21 +6,11 @@ from azureml.core.run import Run
 from datasets import load_dataset
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer, TrainingArguments, Trainer, DefaultDataCollator
 
-def str2bool(v):
-    if isinstance(v, bool):
-        return v
-    if v.lower() in ("yes", "true", "t", "y", "1"):
-        return True
-    elif v.lower() in ("no", "false", "f", "n", "0"):
-        return False
-    else:
-        raise argparse.ArgumentTypeError("Boolean value expected.")
-
 def get_args(raw_args=None):
     parser = argparse.ArgumentParser(description="DistilBERT Fine-Tuning")
 
-    parser.add_argument("--ort", type=str2bool, default=False, help="Use ORTModule")
-    parser.add_argument("--deepspeed", type=str2bool, default=False, help="Use deepspeed")
+    parser.add_argument("--ort", action="store_true", help="Use ORTModule")
+    parser.add_argument("--deepspeed", action="store_true", help="Use deepspeed")
 
     args = parser.parse_args(raw_args)
     print(f"input parameters {vars(args)}")
