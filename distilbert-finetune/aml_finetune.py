@@ -72,7 +72,7 @@ def main(raw_args=None):
         #     description="ACPT DistilBERT fine-tune environment", build=BuildContext(path=environment_dir)
         # ),
         environment=Environment(
-            description="ACPT DistilBERT fine-tune environment", name="prathikrao-test-env"
+            description="ACPT DistilBERT fine-tune environment", uri="azureml://locations/eastus/workspaces/3f9aec1f-8bce-45dd-9358-bb5750b6f300/environments/prathikrao-test-env/versions/1"
         ),
         distribution={
             "type": "pytorch",
