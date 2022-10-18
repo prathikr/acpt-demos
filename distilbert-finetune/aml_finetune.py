@@ -71,7 +71,7 @@ def main(raw_args=None):
         # environment=Environment(
         #     description="ACPT DistilBERT fine-tune environment", build=BuildContext(path=environment_dir)
         # ),
-        environment="azureml:prathikrao-test-env",
+        environment="prathikrao-test-env@latest",
         distribution={
             "type": "pytorch",
             "process_count_per_instance": 8,
