@@ -42,13 +42,13 @@ def main(raw_args=None):
     run_config_args = run_config_to_args(args.run_config)
 
     root_dir = Path(__file__).resolve().parent
-    component_dir = root_dir / "components"
 
     # connect to the workspace
     # documentation: https://learn.microsoft.com/en-us/python/api/azure-ai-ml/azure.ai.ml.mlclient?view=azure-python
     ws_config_path = root_dir / args.ws_config
     ml_client = MLClient.from_config(credential=AzureCliCredential(), path=ws_config_path)
 
+    component_dir = root_dir / "components"
     code_dir = component_dir / "finetune-code"
     environment_dir = component_dir / "environment"
 
@@ -68,8 +68,11 @@ def main(raw_args=None):
             "python finetune.py"
             f" {' '.join(run_config_args)}"
         ),
+        # environment=Environment(
+        #     description="ACPT DistilBERT fine-tune environment", build=BuildContext(path=environment_dir)
+        # ),
         environment=Environment(
-            description="ACPT DistilBERT fine-tune environment", build=BuildContext(path=environment_dir)
+            description="ACPT DistilBERT fine-tune environment", name="prathikrao-test-env"
         ),
         distribution={
             "type": "pytorch",
