@@ -14,9 +14,10 @@ In this demo, we will fine-tune DistilBERT using the SQuAD dataset from the Hugg
 The demo will be run on AzureML. Please complete the following prerequisites:
 
 #### Local environment
-Set up your local environment with azureml dependency for script submission:
+Set up your local environment with az-cli and azureml dependency for script submission:
 
 ```
+az-cli && az login
 pip install azure-ai-ml
 ```
 
