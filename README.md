@@ -32,7 +32,7 @@ pip install azureml-core accelerate datasets transformers
 ## Run Experiments
 The demo is ready to be run.
 
-`aml_submit.py` submits an AML job. This job builds the training environment and runs the fine-tuning script in it.
+#### `aml_submit.py` submits an training job to AML. This job builds the training environment and runs the fine-tuning script in it.
 
 ```bash
 python aml_submit.py --ws_config [Path to workspace config json] --compute [Name of gpu cluster] --run_config [Accelerator configuration]
@@ -52,6 +52,13 @@ An example job submission to a compute target named `v100-32gb-eus` and using OR
 ```
 python aml_submit.py --ws_config ws_config.json --compute v100-32gb-eus \
     --run_config ds_ort
+```
+
+#### `inference.py` runs inferencing on your local machine while inside an ACPT image. 
+
+```
+python inference.py
+python inference.py --ort
 ```
 
 ## FAQ
