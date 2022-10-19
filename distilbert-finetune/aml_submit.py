@@ -48,8 +48,7 @@ def main(raw_args=None):
     ws_config_path = root_dir / args.ws_config
     ml_client = MLClient.from_config(credential=AzureCliCredential(), path=ws_config_path)
 
-    component_dir = root_dir / "components"
-    code_dir = component_dir / "finetune-code"
+    code_dir = root_dir / "finetune-code"
 
     # tags
     tags = {
@@ -67,7 +66,7 @@ def main(raw_args=None):
             "python finetune.py"
             f" {' '.join(run_config_args)}"
         ),
-        environment="prathikrao-test-env@latest",
+        environment="acpt-distilbert-finetune-demo-env@latest",
         distribution={
             "type": "pytorch",
             "process_count_per_instance": 8,
