@@ -130,8 +130,6 @@ def main(raw_args=None):
         trained_model_folder = "model"
         trained_model_path = Path(trained_model_folder)
         trained_model_path.mkdir(parents=True, exist_ok=True)
-        model.config.save_pretrained(trained_model_path / "config")
-        tokenizer.save_pretrained(trained_model_path / "tokenizer")
         model.save_pretrained(trained_model_path / "weights")
 
         # upload saved data to AML
