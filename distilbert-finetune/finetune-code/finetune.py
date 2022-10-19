@@ -71,9 +71,6 @@ def preprocess_function(examples, tokenizer=None):
 def main(raw_args=None):
     args = get_args(raw_args)
 
-    rank = os.environ.get("RANK", -1)
-    assert rank != -1, "RANK environment variable not set"
-
     # load the SQuAD dataset from the Huggingface Datasets library
     squad = load_dataset("squad")
 
@@ -127,6 +124,7 @@ def main(raw_args=None):
     eval_metrics["eval_samples"] = len(tokenized_squad["validation"])
     trainer.log_metrics("eval", eval_metrics)
 
+    rank = os.environ.get("RANK", -1)
     if int(rank) == 0:
         # save trained config, tokenizer and model
         trained_model_folder = "model"
