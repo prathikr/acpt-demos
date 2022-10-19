@@ -50,7 +50,6 @@ def main(raw_args=None):
 
     component_dir = root_dir / "components"
     code_dir = component_dir / "finetune-code"
-    environment_dir = component_dir / "environment"
 
     # tags
     tags = {
@@ -68,9 +67,6 @@ def main(raw_args=None):
             "python finetune.py"
             f" {' '.join(run_config_args)}"
         ),
-        # environment=Environment(
-        #     description="ACPT DistilBERT fine-tune environment", build=BuildContext(path=environment_dir)
-        # ),
         environment="prathikrao-test-env@latest",
         distribution={
             "type": "pytorch",
