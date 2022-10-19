@@ -16,12 +16,15 @@ def infer(args):
     model.eval()
 
     # load test data
-    context = "Beyonce Giselle Knowles-Carter (born September 4, 1981) is an American singer, songwriter, record producer and actress. \
-               Born and raised in Houston, Texas, she performed in various singing and dancing competitions as a child, and rose to fame \
-               in the late 1990s as lead singer of R&B girl-group Destiny's Child. Managed by her father, Mathew Knowles, the group became \
-               one of the world's best-selling girl groups of all time. Their hiatus saw the release of Beyoncé's debut album, Dangerously \
-               in Love (2003), which established her as a solo artist worldwide, earned five Grammy Awards and featured the Billboard Hot \
-               100 number-one singles 'Crazy in Love' and 'Baby Boy'."
+    context = """
+              Beyonce Giselle Knowles-Carter (born September 4, 1981) is an American singer, songwriter, record producer and actress.
+              Born and raised in Houston, Texas, she performed in various singing and dancing competitions as a child, and rose to fame
+              in the late 1990s as lead singer of R&B girl-group Destiny's Child. Managed by her father, Mathew Knowles, the group became
+              one of the world's best-selling girl groups of all time. Their hiatus saw the release of Beyoncé's debut album, Dangerously
+              in Love (2003), which established her as a solo artist worldwide, earned five Grammy Awards and featured the Billboard Hot
+              100 number-one singles 'Crazy in Love' and 'Baby Boy'.
+              
+              """
 
     questions = ["When was Beyonce born?", 
                  "What areas did Beyonce compete in when she was growing up?", 
@@ -49,7 +52,7 @@ def infer(args):
                           input_names=['input_ids', 'attention_mask'], \
                           output_names=['start_logits', "end_logits"]) 
 
-        sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
+        sess = onnxruntime.InferenceSession('model.onnx', providers=['CUDAExecutionProvider'])
         ort_input = {
             'input_ids': np.ascontiguousarray(input_ids.numpy()),
             'attention_mask' : np.ascontiguousarray(attention_mask.numpy()),
@@ -64,6 +67,7 @@ def infer(args):
     end = time.time()
 
     # postprocess test data
+    print("\n\n\n--------- RESULTS ---------")
     print("Context: ", context)
     for i in range(len(questions)):
         if args.ort:

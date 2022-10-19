@@ -24,6 +24,7 @@ def get_args(raw_args=None):
         required=True,
         help="Workspace configuration json file with subscription id, resource group, and workspace name",
     )
+    
     parser.add_argument("--compute", type=str, required=True, help="Compute target to run job on")
 
     # accelerator hyperparameters
