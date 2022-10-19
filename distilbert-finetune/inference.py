@@ -11,6 +11,8 @@ print("device: ", device)
 
 def infer(args):
     # load model and update state dictionary
+    print("loading tokenizer and model...")
+    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
     model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
     model.load_state_dict(torch.load("pytorch_model.bin"))
     model.eval()
@@ -23,7 +25,7 @@ def infer(args):
               one of the world's best-selling girl groups of all time. Their hiatus saw the release of Beyoncé's debut album, Dangerously
               in Love (2003), which established her as a solo artist worldwide, earned five Grammy Awards and featured the Billboard Hot
               100 number-one singles 'Crazy in Love' and 'Baby Boy'.
-              
+
               """
 
     questions = ["When was Beyonce born?", 
@@ -37,7 +39,7 @@ def infer(args):
         inputs.append((question, context))
 
     # tokenize test data
-    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
+    print('tokenizing...')
     encoding = tokenizer.batch_encode_plus(inputs, padding=True, return_tensors="pt")
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
 
@@ -67,7 +69,7 @@ def infer(args):
     end = time.time()
 
     # postprocess test data
-    print("\n\n\n--------- RESULTS ---------")
+    print("\n--------- RESULTS ---------")
     print("Context: ", context)
     for i in range(len(questions)):
         if args.ort:
