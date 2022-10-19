@@ -31,13 +31,13 @@ pip install azureml-core accelerate datasets transformers
 ## Run Experiments
 The demo is ready to be run.
 
-`aml_finetune.py` submits an AML job. This job builds the training environment and runs the fine-tuning script in it.
+`aml_submit.py` submits an AML job. This job builds the training environment and runs the fine-tuning script in it.
 
 ```bash
-python aml_finetune.py --ws_config [Path to workspace config json] --compute [Name of gpu cluster] --run_config [Accelerator configuration]
+python aml_submit.py --ws_config [Path to workspace config json] --compute [Name of gpu cluster] --run_config [Accelerator configuration]
 ```
 
-Here are the different configs and description that `aml_finetune.py` takes through `--run_config` parameter.
+Here are the different configs and description that `aml_submit.py` takes through `--run_config` parameter.
 
 | Config    | Description |
 |-----------|-------------|
@@ -49,11 +49,11 @@ Here are the different configs and description that `aml_finetune.py` takes thro
 An example job submission to a compute target named `v100-32gb-eus` and using ORTModule + Deepspeed:
 
 ```
-python aml_finetune.py --ws_config ws_config.json --compute v100-32gb-eus \
+python aml_submit.py --ws_config ws_config.json --compute v100-32gb-eus \
     --run_config ds_ort
 ```
 
 ## FAQ
 ### Problem with Azure Authentication
 If there's an Azure authentication issue, install Azure CLI [here](https://docs.microsoft.com/en-us/cli/azure/) and run `az login --use-device-code`
-<br>Additionally, you can try replacing DefaultAzureCredential() in aml_finetune.py with AzureCliCredential()
+<br>Additionally, you can try replacing DefaultAzureCredential() in aml_submit.py with AzureCliCredential()
